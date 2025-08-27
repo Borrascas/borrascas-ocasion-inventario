@@ -1,7 +1,7 @@
 {
   "name": "Borrascas Ocasión Inventario",
   "short_name": "Borrascas",
-  "description": "Gestión de inventario y préstamos de bicicletas",
+  "description": "Gestión de inventario y préstamos de bicicletas - v2.0",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
