@@ -465,9 +465,9 @@ const Loaners: React.FC<LoanersProps> = ({ permissions, showToast }) => {
                             <EyeIcon className="w-6 h-6 mr-4 text-blue-400"/> Ver Detalles
                         </button>
                         <ProtectedAction 
-                            permissions={permissions} 
-                            requiredPermission="canEdit" 
+                            hasPermission={permissions.canEdit}
                             fallbackMessage="No tienes permisos para editar bicis de préstamo"
+                            showToast={showToast}
                         >
                             <button onClick={() => { handleEdit(selectedBike); setActionSheetOpen(false); }} className="w-full flex items-center text-left p-4 bg-gray-700/80 hover:bg-gray-700 rounded-lg text-white text-lg">
                                 <EditIcon className="w-6 h-6 mr-4 text-green-400"/> Editar
@@ -475,9 +475,9 @@ const Loaners: React.FC<LoanersProps> = ({ permissions, showToast }) => {
                         </ProtectedAction>
                         {selectedBike.status === LoanerBikeStatus.Available ? (
                             <ProtectedAction 
-                                permissions={permissions} 
-                                requiredPermission="canEdit" 
+                                hasPermission={permissions.canEdit}
                                 fallbackMessage="No tienes permisos para prestar bicis"
+                                showToast={showToast}
                             >
                                 <button onClick={() => { handleLoan(selectedBike); setActionSheetOpen(false); }} className="w-full flex items-center text-left p-4 bg-gray-700/80 hover:bg-gray-700 rounded-lg text-white text-lg">
                                     <UsersIcon className="w-6 h-6 mr-4 text-orange-400"/> Prestar / Alquilar
@@ -485,9 +485,9 @@ const Loaners: React.FC<LoanersProps> = ({ permissions, showToast }) => {
                             </ProtectedAction>
                         ) : (
                             <ProtectedAction 
-                                permissions={permissions} 
-                                requiredPermission="canEdit" 
+                                hasPermission={permissions.canEdit}
                                 fallbackMessage="No tienes permisos para marcar devoluciones"
+                                showToast={showToast}
                             >
                                 <button onClick={() => { handleReturn(selectedBike.id); }} className="w-full flex items-center text-left p-4 bg-gray-700/80 hover:bg-gray-700 rounded-lg text-white text-lg">
                                     <CheckCircleIcon className="w-6 h-6 mr-4 text-sky-400"/> Marcar como Devuelta
