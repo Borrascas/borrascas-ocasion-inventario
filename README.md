@@ -2,6 +2,8 @@
 
 Sistema completo de gestión de inventario para **Borrascas Ocasión**, especialistas en bicicletas de segunda mano.
 
+**Última actualización**: Zoom táctil para móviles - v2.0
+
 ## 🚴‍♂️ Características
 
 - **Gestión de Inventario**: Control completo de bicis en stock
