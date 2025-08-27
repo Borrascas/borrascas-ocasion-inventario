@@ -1,9 +1,10 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { LoanerBike, LoanType } from '../types';
 import Modal from './ui/Modal';
+import ImageViewer from './ui/ImageViewer';
 import { LOANER_STATUS_BADGE_COLORS, LOANER_BIKE_STATUS_TRANSLATIONS } from '../constants';
-import { BikePlaceholderIcon } from './ui/Icons';
+import { BikePlaceholderIcon, EyeIcon } from './ui/Icons';
 
 interface LoanerBikeDetailsModalProps {
     isOpen: boolean;
@@ -19,13 +20,27 @@ const DetailRow: React.FC<{ label: string; value: React.ReactNode }> = ({ label,
 );
 
 const LoanerBikeDetailsModal: React.FC<LoanerBikeDetailsModalProps> = ({ isOpen, onClose, bike }) => {
+    const [isImageViewerOpen, setImageViewerOpen] = useState(false);
     
     return (
         <Modal isOpen={isOpen} onClose={onClose} title="Detalles de la Bici de Préstamo" size="lg">
             <div className="space-y-4">
-                <div className="w-full h-64 bg-gray-700 rounded-lg overflow-hidden flex items-center justify-center">
+                <div className="w-full h-64 bg-gray-700 rounded-lg overflow-hidden flex items-center justify-center relative group">
                     {bike.imageUrl ? (
-                        <img src={bike.imageUrl} alt={`${bike.brand} ${bike.model}`} className="w-full h-full object-cover" />
+                        <>
+                            <img 
+                                src={bike.imageUrl} 
+                                alt={`${bike.brand} ${bike.model}`} 
+                                className="w-full h-full object-cover cursor-pointer" 
+                                onClick={() => setImageViewerOpen(true)}
+                            />
+                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100 cursor-pointer"
+                                 onClick={() => setImageViewerOpen(true)}>
+                                <div className="bg-white/20 backdrop-blur-sm rounded-full p-3">
+                                    <EyeIcon className="w-6 h-6 text-white" />
+                                </div>
+                            </div>
+                        </>
                     ) : (
                         <BikePlaceholderIcon className="w-48 h-48 text-gray-500" />
                     )}
@@ -72,6 +87,16 @@ const LoanerBikeDetailsModal: React.FC<LoanerBikeDetailsModalProps> = ({ isOpen,
                     </button>
                 </div>
             </div>
+            
+            {/* ImageViewer Modal */}
+            {bike.imageUrl && (
+                <ImageViewer
+                    isOpen={isImageViewerOpen}
+                    onClose={() => setImageViewerOpen(false)}
+                    imageUrl={bike.imageUrl}
+                    altText={`${bike.brand} ${bike.model} - Ref. ${bike.refNumber}`}
+                />
+            )}
         </Modal>
     );
 };

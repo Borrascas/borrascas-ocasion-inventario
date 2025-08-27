@@ -1,9 +1,10 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Bike, BikeStatus } from '../types';
 import Modal from './ui/Modal';
+import ImageViewer from './ui/ImageViewer';
 import { STATUS_BADGE_COLORS, BIKE_STATUS_TRANSLATIONS, BIKE_TYPE_TRANSLATIONS } from '../constants';
 import { formatCurrency, calculateDaysBetween, calculateProfitMargin } from '../services/helpers';
-import { BikePlaceholderIcon } from './ui/Icons';
+import { BikePlaceholderIcon, EyeIcon } from './ui/Icons';
 
 // --- Reusable Components for the Modal ---
 
@@ -31,6 +32,7 @@ interface BikeDetailsModalProps {
 }
 
 const BikeDetailsModal: React.FC<BikeDetailsModalProps> = ({ isOpen, onClose, bike, bikes }) => {
+    const [isImageViewerOpen, setImageViewerOpen] = useState(false);
 
     const tradeInBike = useMemo(() => {
         if (!bike.tradeInBikeId) return null;
@@ -74,9 +76,22 @@ const BikeDetailsModal: React.FC<BikeDetailsModalProps> = ({ isOpen, onClose, bi
                 <div className="grid grid-cols-1 md:grid-cols-5 gap-4 sm:gap-6">
                 {/* --- LEFT COLUMN (STORY) --- */}
                 <div className="md:col-span-3 space-y-4 sm:space-y-6">
-                    <div className="w-full h-48 sm:h-64 bg-gray-700 rounded-lg overflow-hidden flex items-center justify-center">
+                    <div className="w-full h-48 sm:h-64 bg-gray-700 rounded-lg overflow-hidden flex items-center justify-center relative group">
                         {bike.imageUrl ? (
-                            <img src={bike.imageUrl} alt={`${bike.brand} ${bike.model}`} className="w-full h-full object-cover" />
+                            <>
+                                <img 
+                                    src={bike.imageUrl} 
+                                    alt={`${bike.brand} ${bike.model}`} 
+                                    className="w-full h-full object-cover cursor-pointer" 
+                                    onClick={() => setImageViewerOpen(true)}
+                                />
+                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100 cursor-pointer"
+                                     onClick={() => setImageViewerOpen(true)}>
+                                    <div className="bg-white/20 backdrop-blur-sm rounded-full p-3">
+                                        <EyeIcon className="w-6 h-6 text-white" />
+                                    </div>
+                                </div>
+                            </>
                         ) : (
                             <BikePlaceholderIcon className="w-32 sm:w-48 h-32 sm:h-48 text-gray-500" />
                         )}
@@ -173,6 +188,16 @@ const BikeDetailsModal: React.FC<BikeDetailsModalProps> = ({ isOpen, onClose, bi
                     Cerrar
                 </button>
             </div>
+            
+            {/* ImageViewer Modal */}
+            {bike.imageUrl && (
+                <ImageViewer
+                    isOpen={isImageViewerOpen}
+                    onClose={() => setImageViewerOpen(false)}
+                    imageUrl={bike.imageUrl}
+                    altText={`${bike.brand} ${bike.model} - Ref. ${bike.refNumber}`}
+                />
+            )}
         </Modal>
     );
 };
