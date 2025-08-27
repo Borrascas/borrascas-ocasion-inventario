@@ -251,7 +251,8 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ isOpen, onClose, imageUrl, al
                 <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-10">
                     <div className="bg-black/70 text-white text-xs px-3 py-2 rounded-lg text-center">
                         <p className="hidden sm:block">🖱️ Rueda del ratón: zoom • 🤏 Arrastra para mover • ESC: cerrar</p>
-                        <p className="sm:hidden">🤏 Pellizca para zoom • 👆 Arrastra para mover • Toca X para cerrar</p>
+                        <p className="sm:hidden">🤏 Pellizca para zoom • 👆 Arrastra para mover • Toca ✕ para cerrar</p>
+                        <p className="text-xs text-gray-400 mt-1">v2.0 - Zoom táctil mejorado</p>
                     </div>
                 </div>
             </div>

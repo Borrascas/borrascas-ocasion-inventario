@@ -1,4 +1,4 @@
-const CACHE_NAME = 'borrascas-v3';
+const CACHE_NAME = 'borrascas-v4';
 const urlsToCache = [
   '/',
   '/index.html',
