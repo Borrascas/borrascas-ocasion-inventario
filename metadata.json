@@ -1,0 +1,8 @@
+{
+  "name": "Borrascas Ocasión Inventario",
+  "description": "Una aplicación completa para la gestión de inventario de Borrascas Ocasión, especialistas en bicicletas de segunda mano, con panel detallado, seguimiento de inventario y flujo de trabajo de ventas inteligente.",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "prompt": "Esta aplicación necesita acceso a tu cámara para que puedas añadir fotos de las bicicletas directamente a tu inventario."
+}

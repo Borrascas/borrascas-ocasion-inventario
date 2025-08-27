@@ -1,0 +1,138 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Prevent zoom on mobile devices */
+@media screen and (max-width: 768px) {
+  * {
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  
+  body {
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    overflow-x: hidden;
+    position: relative;
+    /* Add safe area padding for navigation bars */
+    padding-bottom: 4rem; /* Fixed padding for Samsung navigation bar */
+    min-height: 100vh;
+    min-height: 100dvh; /* Dynamic viewport height for better mobile support */
+  }
+  
+  /* Additional padding for main content area */
+  main {
+    padding-bottom: 4rem !important;
+  }
+  
+  html {
+    overflow-x: hidden;
+    /* Ensure theme color consistency */
+    background-color: #111827;
+  }
+}
+
+/* Theme color consistency across all devices */
+html {
+  background-color: #111827;
+}
+
+body {
+  background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(120, 119, 198, 0.3), #111827);
+  background-color: #111827; /* Fallback */
+}
+
+/* Safe area handling for modals and fixed elements */
+@media screen and (max-width: 768px) {
+  .modal-content {
+    padding-bottom: 3rem !important; /* Fixed padding for Samsung navigation bar */
+  }
+  
+  /* Ensure buttons in modals have proper spacing from navigation bar */
+  .modal-buttons {
+    padding-bottom: 2rem !important;
+    margin-bottom: 1rem !important;
+  }
+}
+
+/* Fallback for devices that support safe-area-inset */
+@supports (padding: env(safe-area-inset-bottom)) {
+  @media screen and (max-width: 768px) {
+    .modal-content {
+      padding-bottom: calc(3rem + env(safe-area-inset-bottom)) !important;
+    }
+    
+    .modal-buttons {
+      padding-bottom: calc(2rem + env(safe-area-inset-bottom)) !important;
+      margin-bottom: calc(1rem + env(safe-area-inset-bottom)) !important;
+    }
+  }
+}
+
+/* Animations */
+@keyframes fade-in {
+  from { 
+    opacity: 0; 
+    transform: translateY(10px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.5s ease-out forwards;
+}
+
+@keyframes sheet-in {
+  from { 
+    transform: translateY(100%); 
+  }
+  to { 
+    transform: translateY(0); 
+  }
+}
+
+@keyframes sheet-out {
+  from { 
+    transform: translateY(0); 
+  }
+  to { 
+    transform: translateY(100%); 
+  }
+}
+
+.animate-sheet-in { 
+  animation: sheet-in 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; 
+}
+
+.animate-sheet-out { 
+  animation: sheet-out 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; 
+}
+
+/* Hide arrows from number inputs */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  margin: 0;
+}
+
+input[type=number] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+/* Hover effects */
+.lift-on-hover {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.lift-on-hover:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2), 0 0 20px rgba(100, 200, 255, 0.3);
+}
