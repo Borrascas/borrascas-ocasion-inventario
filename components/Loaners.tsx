@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { LoanerBike, LoanerBikeStatus, LoanData, UserPermissions } from '../types';
-import { useLoanerBikes, useCreateLoanerBike, useUpdateLoanerBike, useLoanOrRentBike, useReturnBike, useDeleteLoanerBike } from '../services/loanerBikeQueries';
+import { useLoanerBikes, useCreateLoanerBike, useUpdateLoanerBike, useLoanOrRentBike, useReturnBike, useDeleteLoanerBike, useAllLoanerBikes } from '../services/loanerBikeQueries';
 import Loading from './ui/Loading';
 import { CardSkeleton, TableRowSkeleton } from './ui/Skeleton';
 import { LOANER_STATUS_COLORS, LOANER_STATUS_BADGE_COLORS, LOANER_BIKE_STATUS_TRANSLATIONS } from '../constants';
@@ -11,6 +11,7 @@ import LoanBikeModal from './LoanBikeModal';
 import CustomSelect from './ui/CustomSelect';
 import ProtectedAction from './ui/ProtectedAction';
 import Modal from './ui/Modal';
+import ConfirmModal from './ui/ConfirmModal';
 import { capitalizeFirstLetter, uploadImageToSupabase } from '../services/helpers';
 
 // Componente interno para reemplazar LoanerBikeFormModal
@@ -149,21 +150,12 @@ const Loaners: React.FC<LoanersProps> = ({ permissions, showToast }) => {
     const [isDetailsModalOpen, setDetailsModalOpen] = useState(false);
     const [isLoanModalOpen, setLoanModalOpen] = useState(false);
     const [isActionSheetOpen, setActionSheetOpen] = useState(false);
+    const [isConfirmDeleteModalOpen, setConfirmDeleteModalOpen] = useState(false);
     const [selectedBike, setSelectedBike] = useState<LoanerBike | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState<LoanerBikeStatus | 'All'>('All');
 
-    const [page, setPage] = useState(1);
-    const PAGE_SIZE = 10;
-    
-    const { data, isLoading } = useLoanerBikes({ 
-        page, 
-        pageSize: PAGE_SIZE 
-    });
-
-    const bikes = data?.bikes || [];
-    const hasNextPage = data?.hasNextPage || false;
-    const totalPages = data?.totalPages || 1;
+    const { data: bikes = [], isLoading } = useAllLoanerBikes();
     const { mutate: createBike } = useCreateLoanerBike();
     const { mutate: updateBikeMutation } = useUpdateLoanerBike();
     const { mutate: loanOrRentMutation } = useLoanOrRentBike();
@@ -171,6 +163,8 @@ const Loaners: React.FC<LoanersProps> = ({ permissions, showToast }) => {
     const { mutate: deleteBikeMutation } = useDeleteLoanerBike();
 
     const nextRefNumber = useMemo(() => {
+        if (!bikes || bikes.length === 0) return 'P-001';
+        
         const prefix = 'P-';
         const maxRef = bikes.reduce((max, b) => {
             if (!b.refNumber.startsWith(prefix)) return max;
@@ -183,6 +177,8 @@ const Loaners: React.FC<LoanersProps> = ({ permissions, showToast }) => {
     // No need for early return on loading, we'll show skeletons inline
 
     const filteredBikes = useMemo(() => {
+        if (!bikes || bikes.length === 0) return [];
+        
         let bikesToFilter = bikes;
 
         if (statusFilter !== 'All') {
@@ -230,10 +226,16 @@ const Loaners: React.FC<LoanersProps> = ({ permissions, showToast }) => {
         setActionSheetOpen(false);
     }
 
-    const handleDelete = (bikeId: number) => {
-        if (confirm('¿Estás seguro de que quieres eliminar esta bicicleta de préstamo? Esta acción no se puede deshacer.')) {
-            deleteBikeMutation(bikeId.toString());
-            setActionSheetOpen(false);
+    const handleDelete = (bike: LoanerBike) => {
+        setSelectedBike(bike);
+        setConfirmDeleteModalOpen(true);
+        setActionSheetOpen(false);
+    }
+
+    const executeDelete = async () => {
+        if (selectedBike) {
+            deleteBikeMutation(selectedBike.id.toString());
+            setConfirmDeleteModalOpen(false);
         }
     }
 
@@ -398,25 +400,6 @@ const Loaners: React.FC<LoanersProps> = ({ permissions, showToast }) => {
                             </tbody>
                         </table>
                     </div>
-                    <div className="p-4 flex items-center justify-between border-t border-gray-700">
-                        <button
-                            onClick={() => setPage(p => Math.max(1, p - 1))}
-                            disabled={page === 1}
-                            className="px-4 py-2 bg-gray-700/80 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            Anterior
-                        </button>
-                        <span className="text-gray-400">
-                            Página {page} de {totalPages}
-                        </span>
-                        <button
-                            onClick={() => setPage(p => p + 1)}
-                            disabled={!hasNextPage}
-                            className="px-4 py-2 bg-gray-700/80 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            Siguiente
-                        </button>
-                    </div>
                 </div>
             </div>
             
@@ -469,7 +452,7 @@ const Loaners: React.FC<LoanersProps> = ({ permissions, showToast }) => {
                  <ActionSheet isOpen={isActionSheetOpen} onClose={() => setActionSheetOpen(false)}>
                     <h3 className="text-lg font-bold text-center text-white px-4 mb-2">{selectedBike.brand} {selectedBike.model}</h3>
                     <div className="p-2 space-y-2">
-                         <button onClick={() => { handleView(selectedBike); setActionSheetOpen(false); }} className="w-full flex items-center text-left p-4 bg-gray-700/80 hover:bg-gray-700 rounded-lg text-white text-lg">
+                         <button onClick={() => { handleView(selectedBike); setActionSheetOpen(false); }} className="w-full flex items-center justify-center p-4 bg-gray-700/80 hover:bg-gray-700 rounded-lg text-white text-lg">
                             <EyeIcon className="w-6 h-6 mr-4 text-blue-400"/> Ver Detalles
                         </button>
                         <ProtectedAction 
@@ -477,7 +460,7 @@ const Loaners: React.FC<LoanersProps> = ({ permissions, showToast }) => {
                             fallbackMessage="No tienes permisos para editar bicis de préstamo"
                             showToast={showToast}
                         >
-                            <button onClick={() => { handleEdit(selectedBike); setActionSheetOpen(false); }} className="w-full flex items-center text-left p-4 bg-gray-700/80 hover:bg-gray-700 rounded-lg text-white text-lg">
+                            <button onClick={() => { handleEdit(selectedBike); setActionSheetOpen(false); }} className="w-full flex items-center justify-center p-4 bg-gray-700/80 hover:bg-gray-700 rounded-lg text-white text-lg">
                                 <EditIcon className="w-6 h-6 mr-4 text-green-400"/> Editar
                             </button>
                         </ProtectedAction>
@@ -487,7 +470,7 @@ const Loaners: React.FC<LoanersProps> = ({ permissions, showToast }) => {
                                 fallbackMessage="No tienes permisos para prestar bicis"
                                 showToast={showToast}
                             >
-                                <button onClick={() => { handleLoan(selectedBike); setActionSheetOpen(false); }} className="w-full flex items-center text-left p-4 bg-gray-700/80 hover:bg-gray-700 rounded-lg text-white text-lg">
+                                <button onClick={() => { handleLoan(selectedBike); setActionSheetOpen(false); }} className="w-full flex items-center justify-center p-4 bg-gray-700/80 hover:bg-gray-700 rounded-lg text-white text-lg">
                                     <UsersIcon className="w-6 h-6 mr-4 text-orange-400"/> Prestar / Alquilar
                                 </button>
                             </ProtectedAction>
@@ -497,7 +480,7 @@ const Loaners: React.FC<LoanersProps> = ({ permissions, showToast }) => {
                                 fallbackMessage="No tienes permisos para marcar devoluciones"
                                 showToast={showToast}
                             >
-                                <button onClick={() => { handleReturn(selectedBike.id); }} className="w-full flex items-center text-left p-4 bg-gray-700/80 hover:bg-gray-700 rounded-lg text-white text-lg">
+                                <button onClick={() => { handleReturn(selectedBike.id); }} className="w-full flex items-center justify-center p-4 bg-gray-700/80 hover:bg-gray-700 rounded-lg text-white text-lg">
                                     <CheckCircleIcon className="w-6 h-6 mr-4 text-sky-400"/> Marcar como Devuelta
                                 </button>
                             </ProtectedAction>
@@ -507,12 +490,27 @@ const Loaners: React.FC<LoanersProps> = ({ permissions, showToast }) => {
                             fallbackMessage="No tienes permisos para eliminar bicis de préstamo"
                             showToast={showToast}
                         >
-                            <button onClick={() => { handleDelete(selectedBike.id); }} className="w-full flex items-center text-left p-4 bg-gray-700/80 hover:bg-gray-700 rounded-lg text-white text-lg">
+                            <button onClick={() => { handleDelete(selectedBike); }} className="w-full flex items-center justify-center p-4 bg-red-900/70 hover:bg-red-800 rounded-lg text-white text-lg transition-colors">
                                 <TrashIcon className="w-6 h-6 mr-4 text-red-400"/> Eliminar
                             </button>
                         </ProtectedAction>
                     </div>
                 </ActionSheet>
+            )}
+
+            {isConfirmDeleteModalOpen && selectedBike && (
+                <ConfirmModal
+                    isOpen={isConfirmDeleteModalOpen}
+                    onClose={() => setConfirmDeleteModalOpen(false)}
+                    onConfirm={executeDelete}
+                    title="Confirmar Eliminación"
+                >
+                    <p className="text-lg">¿Estás seguro de que quieres eliminar esta bicicleta de préstamo?</p>
+                    <p className="font-bold text-white mt-2">#{selectedBike.refNumber} - {selectedBike.brand} {selectedBike.model}</p>
+                    <p className="mt-2 text-sm text-gray-400">
+                        Esta acción no se puede deshacer. La bicicleta será eliminada permanentemente del sistema.
+                    </p>
+                </ConfirmModal>
             )}
         </div>
     );

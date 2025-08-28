@@ -424,7 +424,7 @@ const Inventory: React.FC<Props> = ({ showToast, permissions }) => {
                  <ActionSheet isOpen={isActionSheetOpen} onClose={() => setActionSheetOpen(false)}>
                     <h3 className="text-lg font-bold text-center text-white px-4 mb-2">{selectedBike.brand} {selectedBike.model}</h3>
                     <div className="p-2 space-y-2">
-                         <button onClick={() => { handleView(selectedBike); setActionSheetOpen(false); }} className="w-full flex items-center text-left p-4 bg-gray-700/80 hover:bg-gray-700 rounded-lg text-white text-lg">
+                         <button onClick={() => { handleView(selectedBike); setActionSheetOpen(false); }} className="w-full flex items-center justify-center p-4 bg-gray-700/80 hover:bg-gray-700 rounded-lg text-white text-lg">
                             <EyeIcon className="w-6 h-6 mr-4 text-blue-400"/> Ver Detalles
                         </button>
                         
@@ -433,7 +433,7 @@ const Inventory: React.FC<Props> = ({ showToast, permissions }) => {
                             fallbackMessage="No tienes permisos para editar bicicletas"
                             showToast={showToast}
                         >
-                            <button onClick={() => { handleEdit(selectedBike); setActionSheetOpen(false); }} className="w-full flex items-center text-left p-4 bg-gray-700/80 hover:bg-gray-700 rounded-lg text-white text-lg">
+                            <button onClick={() => { handleEdit(selectedBike); setActionSheetOpen(false); }} className="w-full flex items-center justify-center p-4 bg-gray-700/80 hover:bg-gray-700 rounded-lg text-white text-lg">
                                 <EditIcon className="w-6 h-6 mr-4 text-green-400"/> Editar
                             </button>
                         </ProtectedAction>
@@ -443,7 +443,7 @@ const Inventory: React.FC<Props> = ({ showToast, permissions }) => {
                             fallbackMessage="No tienes permisos para vender bicicletas"
                             showToast={showToast}
                         >
-                            <button onClick={() => { handleSell(selectedBike); setActionSheetOpen(false); }} className="w-full flex items-center text-left p-4 bg-gray-700/80 hover:bg-gray-700 rounded-lg text-white text-lg" disabled={selectedBike.status === BikeStatus.Sold}>
+                            <button onClick={() => { handleSell(selectedBike); setActionSheetOpen(false); }} className="w-full flex items-center justify-center p-4 bg-gray-700/80 hover:bg-gray-700 rounded-lg text-white text-lg" disabled={selectedBike.status === BikeStatus.Sold}>
                                 <EuroIcon className="w-6 h-6 mr-4 text-yellow-400"/> Marcar como Vendida
                             </button>
                         </ProtectedAction>

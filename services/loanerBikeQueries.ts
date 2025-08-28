@@ -37,6 +37,23 @@ export const useLoanerBikes = ({ page, pageSize }: UseLoanerBikesParams) => {
     });
 };
 
+// Nueva query sin paginación (como el inventario)
+export const useAllLoanerBikes = () => {
+    return useQuery({
+        queryKey: [QUERY_KEYS.loanerBikes],
+        queryFn: async () => {
+            const { data: bikes, error } = await supabase
+                .from('loaner_bikes')
+                .select('*')
+                .order('entryDate', { ascending: false });
+
+            if (error) throw error;
+
+            return bikes || [];
+        },
+    });
+};
+
 export const useLoanerBike = (id: string) => {
     return useQuery({
         queryKey: QUERY_KEYS.loanerBike(id),

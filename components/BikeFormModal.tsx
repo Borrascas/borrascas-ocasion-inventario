@@ -185,7 +185,7 @@ const BikeFormModal: React.FC<BikeFormModalProps> = ({ isOpen, onClose, onSave, 
                         <label htmlFor="purchasePrice" className="block text-sm font-medium text-gray-300">Compra (€)</label>
                         <input 
                             type="number" 
-                            inputmode="decimal"
+                            inputMode="decimal"
                             step="0.01" 
                             name="purchasePrice" 
                             id="purchasePrice" 
@@ -199,7 +199,7 @@ const BikeFormModal: React.FC<BikeFormModalProps> = ({ isOpen, onClose, onSave, 
                         <label htmlFor="sellPrice" className="block text-sm font-medium text-gray-300">Venta (€)</label>
                         <input 
                             type="number" 
-                            inputmode="decimal"
+                            inputMode="decimal"
                             step="0.01" 
                             name="sellPrice" 
                             id="sellPrice" 
@@ -213,7 +213,7 @@ const BikeFormModal: React.FC<BikeFormModalProps> = ({ isOpen, onClose, onSave, 
                         <label htmlFor="additionalCosts" className="block text-sm font-medium text-gray-300">Costes (€)</label>
                         <input 
                             type="number" 
-                            inputmode="decimal"
+                            inputMode="decimal"
                             step="0.01" 
                             name="additionalCosts" 
                             id="additionalCosts" 
