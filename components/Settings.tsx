@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LogOutIcon, DownloadIcon, UserIcon, MoonIcon, SunIcon, UsersIcon, CheckCircleIcon, XIcon } from './ui/Icons';
+import { LogOutIcon, DownloadIcon, UserIcon, MoonIcon, SunIcon, UsersIcon, CheckCircleIcon, XIcon, TrashIcon } from './ui/Icons';
 import { supabase } from '../services/supabaseClient';
 import { useBikes } from '../services/bikeQueries';
 import { useLoanerBikes } from '../services/loanerBikeQueries';
@@ -209,44 +209,87 @@ const Settings: React.FC<SettingsProps> = ({ permissions, userProfile }) => {
                             </button>
 
                             {showUserManagement && (
-                                <div className="space-y-3">
+                                <div className="space-y-3 overflow-hidden">
                                     {loadingUsers ? (
                                         <div className="text-center py-4">
                                             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto"></div>
                                             <p className="text-gray-400 mt-2">Cargando usuarios...</p>
                                         </div>
                                     ) : (
-                                        <div className="space-y-2 max-h-64 overflow-y-auto">
+                                        <div className="space-y-2 max-h-64 overflow-y-auto overflow-x-hidden">
                                             {users.map(user => (
-                                                <div key={user.id} className="flex items-center justify-between p-3 bg-gray-700/30 rounded-lg">
-                                                    <div className="flex-1 min-w-0">
-                                                        <p className="text-white font-medium truncate">{user.email}</p>
-                                                        <p className="text-xs text-gray-400">
-                                                            Registrado: {new Date(user.created_at).toLocaleDateString()}
-                                                        </p>
-                                                    </div>
-                                                    
-                                                    <div className="flex items-center space-x-2 ml-3">
-                                                        <select
-                                                            value={user.role}
-                                                            onChange={(e) => handleRoleChange(user.id, e.target.value as UserRole)}
-                                                            disabled={updatingUser === user.id || user.id === userProfile?.id}
-                                                            className="text-xs bg-gray-600 text-white rounded px-2 py-1 border border-gray-500"
-                                                        >
-                                                            <option value={UserRole.Pending}>Pendiente</option>
-                                                            <option value={UserRole.Viewer}>Visualizador</option>
-                                                            <option value={UserRole.Editor}>Editor</option>
-                                                            <option value={UserRole.Admin}>Admin</option>
-                                                        </select>
-                                                        
-                                                        {user.id !== userProfile?.id && (
-                                                            <button
-                                                                onClick={() => setDeleteConfirmUser(user)}
-                                                                className="p-1 text-red-400 hover:text-red-300 transition-colors"
+                                                <div key={user.id} className="p-3 bg-gray-700/30 rounded-lg">
+                                                    {/* Vista móvil: columna */}
+                                                    <div className="sm:hidden">
+                                                        <div className="mb-2">
+                                                            <p className="text-white font-medium text-sm break-all" title={user.email}>{user.email}</p>
+                                                            <p className="text-xs text-gray-400 mt-1">
+                                                                Registrado: {new Date(user.created_at).toLocaleDateString()}
+                                                            </p>
+                                                        </div>
+                                                        <div className="flex items-center justify-between">
+                                                            <select
+                                                                value={user.role}
+                                                                onChange={(e) => handleRoleChange(user.id, e.target.value as UserRole)}
+                                                                disabled={updatingUser === user.id || user.id === userProfile?.id}
+                                                                className="text-xs bg-gray-600 text-white rounded px-2 py-1 border border-gray-500 flex-1 mr-2"
                                                             >
-                                                                <XIcon className="w-4 h-4" />
-                                                            </button>
-                                                        )}
+                                                                <option value={UserRole.Pending}>Pendiente</option>
+                                                                <option value={UserRole.Viewer}>Viewer</option>
+                                                                <option value={UserRole.Editor}>Editor</option>
+                                                                <option value={UserRole.Admin}>Admin</option>
+                                                            </select>
+                                                            {updatingUser === user.id ? (
+                                                                <div className="w-8 h-8 flex items-center justify-center">
+                                                                    <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                                                                </div>
+                                                            ) : user.id !== userProfile?.id && (
+                                                                <button
+                                                                    onClick={() => setDeleteConfirmUser(user)}
+                                                                    className="p-2 text-red-500 hover:text-red-400 hover:bg-red-500/20 rounded transition-colors border border-transparent hover:border-red-500/30"
+                                                                    title="Eliminar usuario"
+                                                                >
+                                                                    <TrashIcon className="w-4 h-4" />
+                                                                </button>
+                                                            )}
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Vista desktop: fila */}
+                                                    <div className="hidden sm:flex items-center justify-between">
+                                                        <div className="flex-1 min-w-0 max-w-[60%]">
+                                                            <p className="text-white font-medium truncate" title={user.email}>{user.email}</p>
+                                                            <p className="text-xs text-gray-400">
+                                                                Registrado: {new Date(user.created_at).toLocaleDateString()}
+                                                            </p>
+                                                        </div>
+                                                        
+                                                        <div className="flex items-center space-x-2 ml-3 flex-shrink-0">
+                                                            <select
+                                                                value={user.role}
+                                                                onChange={(e) => handleRoleChange(user.id, e.target.value as UserRole)}
+                                                                disabled={updatingUser === user.id || user.id === userProfile?.id}
+                                                                className="text-xs bg-gray-600 text-white rounded px-2 py-1 border border-gray-500 min-w-0 w-20 sm:w-auto"
+                                                            >
+                                                                <option value={UserRole.Pending}>Pendiente</option>
+                                                                <option value={UserRole.Viewer}>Viewer</option>
+                                                                <option value={UserRole.Editor}>Editor</option>
+                                                                <option value={UserRole.Admin}>Admin</option>
+                                                            </select>
+                                                            {updatingUser === user.id ? (
+                                                                <div className="w-8 h-8 flex items-center justify-center">
+                                                                    <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                                                                </div>
+                                                            ) : user.id !== userProfile?.id && (
+                                                                <button
+                                                                    onClick={() => setDeleteConfirmUser(user)}
+                                                                    className="p-1 text-red-500 hover:text-red-400 hover:bg-red-500/20 rounded transition-colors border border-transparent hover:border-red-500/30"
+                                                                    title="Eliminar usuario"
+                                                                >
+                                                                    <TrashIcon className="w-4 h-4" />
+                                                                </button>
+                                                            )}
+                                                        </div>
                                                     </div>
                                                 </div>
                                             ))}
