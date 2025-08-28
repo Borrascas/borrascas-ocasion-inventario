@@ -117,8 +117,8 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ isOpen, onClose, imageUrl, al
         setIsTouch(true);
         e.preventDefault();
         
-        if (e.touches.length === 1 && scale > 1) {
-            // Pan con un dedo
+        if (e.touches.length === 1) {
+            // Pan con un dedo (sin condición de scale > 1)
             setIsDragging(true);
             setDragStart({
                 x: e.touches[0].clientX - position.x,
@@ -135,11 +135,14 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ isOpen, onClose, imageUrl, al
     const handleTouchMove = (e: React.TouchEvent) => {
         e.preventDefault();
         
-        if (e.touches.length === 1 && isDragging && scale > 1) {
-            // Pan con un dedo
+        if (e.touches.length === 1 && isDragging) {
+            // Pan con un dedo - siempre permitir movimiento
+            const newX = e.touches[0].clientX - dragStart.x;
+            const newY = e.touches[0].clientY - dragStart.y;
+            
             setPosition({
-                x: e.touches[0].clientX - dragStart.x,
-                y: e.touches[0].clientY - dragStart.y
+                x: newX,
+                y: newY
             });
         } else if (e.touches.length === 2 && lastTouchDistance > 0) {
             // Pinch zoom con dos dedos
@@ -229,7 +232,7 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ isOpen, onClose, imageUrl, al
                     onTouchMove={handleTouchMove}
                     onTouchEnd={handleTouchEnd}
                     style={{ 
-                        cursor: scale > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default',
+                        cursor: isTouch ? 'default' : (scale > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default'),
                         touchAction: 'none' // Evita scroll nativo en móvil
                     }}
                 >
@@ -247,14 +250,7 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ isOpen, onClose, imageUrl, al
                     />
                 </div>
 
-                {/* Instrucciones */}
-                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-10">
-                    <div className="bg-black/70 text-white text-xs px-3 py-2 rounded-lg text-center">
-                        <p className="hidden sm:block">🖱️ Rueda del ratón: zoom • 🤏 Arrastra para mover • ESC: cerrar</p>
-                        <p className="sm:hidden">🤏 Pellizca para zoom • 👆 Arrastra para mover • Toca ✕ para cerrar</p>
-                        <p className="text-xs text-gray-400 mt-1">v2.0 - Zoom táctil mejorado</p>
-                    </div>
-                </div>
+
             </div>
         </div>
     );

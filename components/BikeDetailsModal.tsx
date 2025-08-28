@@ -120,7 +120,7 @@ const BikeDetailsModal: React.FC<BikeDetailsModalProps> = ({ isOpen, onClose, bi
 
                     {tradeInForBike && (
                          <InfoCard title="Entregada a Cambio de">
-                             <DetailItem label="Ref. Bici Comprada" value={`#${tradeInForBike.refNumber}`} />
+                             <DetailItem label="Ref. Bici" value={`#${tradeInForBike.refNumber}`} />
                              <DetailItem label="Modelo" value={`${tradeInForBike.brand} ${tradeInForBike.model}`} />
                         </InfoCard>
                     )}
