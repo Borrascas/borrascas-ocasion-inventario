@@ -11,7 +11,11 @@ const Header: React.FC<HeaderProps> = ({ toggleSidebar }) => {
             <div className="flex items-center justify-between h-[73px] px-4 md:px-6">
                 <button
                     onClick={toggleSidebar}
-                    className="md:hidden text-gray-400 hover:text-white focus:outline-none"
+                    className="md:hidden text-gray-400 hover:text-white focus:outline-none active:bg-gray-700"
+                    style={{ 
+                        WebkitTapHighlightColor: 'transparent',
+                        touchAction: 'manipulation'
+                    }}
                     aria-label="Open sidebar"
                 >
                     <MenuIcon className="h-6 w-6" />

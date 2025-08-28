@@ -53,14 +53,25 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, permissions, showT
 
     return (
         <>
-            <div className={`fixed inset-0 bg-black/60 z-30 md:hidden ${isOpen ? 'block' : 'hidden'}`} onClick={() => setIsOpen(false)}></div>
-            <aside className={`absolute md:relative z-40 md:z-auto w-64 bg-gray-900 border-r border-gray-700/50 h-full transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col`}>
+            <div className={`fixed inset-0 bg-black/60 z-30 md:hidden ${isOpen ? 'block' : 'hidden'}`} 
+                 onClick={() => setIsOpen(false)}
+                 style={{ 
+                     WebkitTapHighlightColor: 'transparent',
+                     touchAction: 'manipulation'
+                 }}></div>
+            <aside className={`absolute md:relative z-40 md:z-auto w-64 bg-gray-900 border-r border-gray-700/50 h-full transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col`}
+                   style={{ height: '-webkit-fill-available' }}>
                 <div>
                     <div className="flex items-center justify-between p-4 border-b border-gray-700/50 h-[73px]">
                         <NavLink to="/" onClick={() => setIsOpen(false)}>
                             <img src={logoSrc} alt="Borrascas Bicicletas Ocasión Logo" className="h-full object-contain" />
                         </NavLink>
-                         <button onClick={() => setIsOpen(false)} className="md:hidden p-1 rounded-full hover:bg-gray-700">
+                         <button onClick={() => setIsOpen(false)} 
+                                className="md:hidden p-1 rounded-full hover:bg-gray-700 active:bg-gray-600"
+                                style={{ 
+                                    WebkitTapHighlightColor: 'transparent',
+                                    touchAction: 'manipulation'
+                                }}>
                             <XIcon className="w-6 h-6" />
                         </button>
                     </div>

@@ -8,6 +8,9 @@
     -webkit-text-size-adjust: 100%;
     -ms-text-size-adjust: 100%;
     text-size-adjust: 100%;
+    /* iOS Safari touch improvements */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
   }
   
   body {
@@ -20,6 +23,7 @@
     padding-bottom: 4rem; /* Fixed padding for Samsung navigation bar */
     min-height: 100vh;
     min-height: 100dvh; /* Dynamic viewport height for better mobile support */
+    min-height: -webkit-fill-available; /* Safari iOS fallback */
   }
   
   /* Additional padding for main content area */
@@ -37,11 +41,17 @@
 /* Theme color consistency across all devices */
 html {
   background-color: #111827;
+  /* iOS Safari specific fixes */
+  height: 100%;
+  height: -webkit-fill-available;
 }
 
 body {
   background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(120, 119, 198, 0.3), #111827);
   background-color: #111827; /* Fallback */
+  /* iOS Safari specific fixes */
+  height: 100%;
+  height: -webkit-fill-available;
 }
 
 /* Safe area handling for modals and fixed elements */
