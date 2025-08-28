@@ -1,10 +1,10 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { LoanerBike, LoanerBikeStatus, LoanData, UserPermissions } from '../types';
-import { useLoanerBikes, useCreateLoanerBike, useUpdateLoanerBike, useLoanOrRentBike, useReturnBike } from '../services/loanerBikeQueries';
+import { useLoanerBikes, useCreateLoanerBike, useUpdateLoanerBike, useLoanOrRentBike, useReturnBike, useDeleteLoanerBike } from '../services/loanerBikeQueries';
 import Loading from './ui/Loading';
 import { CardSkeleton, TableRowSkeleton } from './ui/Skeleton';
 import { LOANER_STATUS_COLORS, LOANER_STATUS_BADGE_COLORS, LOANER_BIKE_STATUS_TRANSLATIONS } from '../constants';
-import { EyeIcon, EditIcon, CheckCircleIcon, SearchIcon, UsersIcon, MoreVerticalIcon, BikePlaceholderIcon } from './ui/Icons';
+import { EyeIcon, EditIcon, CheckCircleIcon, SearchIcon, UsersIcon, MoreVerticalIcon, BikePlaceholderIcon, TrashIcon } from './ui/Icons';
 import ActionSheet from './ActionSheet';
 import LoanerBikeDetailsModal from './LoanerBikeDetailsModal';
 import LoanBikeModal from './LoanBikeModal';
@@ -104,8 +104,8 @@ const LoanerBikeFormModalInternal: React.FC<{
                                 <input type="text" name="refNumber" id="refNumber" value={formData.refNumber || ''} readOnly className="mt-1 block w-full bg-gray-900 border-gray-600 rounded-md shadow-sm text-gray-400 cursor-not-allowed" />
                             </div>
                             <div>
-                               <label htmlFor="serialNumber" className="block text-sm font-medium text-gray-300">Nº de Serie</label>
-                               <input type="text" name="serialNumber" id="serialNumber" value={formData.serialNumber || ''} onChange={handleChange} className="mt-1 block w-full bg-gray-700 border-gray-600 rounded-md shadow-sm text-white focus:ring-blue-500 focus:border-blue-500" />
+                                <label htmlFor="size" className="block text-sm font-medium text-gray-300">Talla</label>
+                                <input type="text" name="size" id="size" value={formData.size || ''} onChange={handleChange} required className="mt-1 block w-full bg-gray-700 border-gray-600 rounded-md shadow-sm text-white focus:ring-blue-500 focus:border-blue-500" />
                             </div>
                         </div>
                         <div className="grid grid-cols-2 gap-4">
@@ -120,8 +120,8 @@ const LoanerBikeFormModalInternal: React.FC<{
                         </div>
                          <div className="grid grid-cols-1 gap-4">
                             <div>
-                                <label htmlFor="size" className="block text-sm font-medium text-gray-300">Talla</label>
-                               <input type="text" name="size" id="size" value={formData.size || ''} onChange={handleChange} required className="mt-1 block w-full bg-gray-700 border-gray-600 rounded-md shadow-sm text-white focus:ring-blue-500 focus:border-blue-500" />
+                                <label htmlFor="serialNumber" className="block text-sm font-medium text-gray-300">Nº de Serie</label>
+                                <input type="text" name="serialNumber" id="serialNumber" value={formData.serialNumber || ''} onChange={handleChange} className="mt-1 block w-full bg-gray-700 border-gray-600 rounded-md shadow-sm text-white focus:ring-blue-500 focus:border-blue-500" />
                             </div>
                         </div>
                     </div>
@@ -168,6 +168,7 @@ const Loaners: React.FC<LoanersProps> = ({ permissions, showToast }) => {
     const { mutate: updateBikeMutation } = useUpdateLoanerBike();
     const { mutate: loanOrRentMutation } = useLoanOrRentBike();
     const { mutate: returnBikeMutation } = useReturnBike();
+    const { mutate: deleteBikeMutation } = useDeleteLoanerBike();
 
     const nextRefNumber = useMemo(() => {
         const prefix = 'P-';
@@ -227,6 +228,13 @@ const Loaners: React.FC<LoanersProps> = ({ permissions, showToast }) => {
     const handleReturn = (bikeId: number) => {
         returnBikeMutation(bikeId.toString());
         setActionSheetOpen(false);
+    }
+
+    const handleDelete = (bikeId: number) => {
+        if (confirm('¿Estás seguro de que quieres eliminar esta bicicleta de préstamo? Esta acción no se puede deshacer.')) {
+            deleteBikeMutation(bikeId.toString());
+            setActionSheetOpen(false);
+        }
     }
 
     const handleSaveBike = (bikeData: any) => {
@@ -494,6 +502,15 @@ const Loaners: React.FC<LoanersProps> = ({ permissions, showToast }) => {
                                 </button>
                             </ProtectedAction>
                         )}
+                        <ProtectedAction 
+                            hasPermission={permissions.canDelete}
+                            fallbackMessage="No tienes permisos para eliminar bicis de préstamo"
+                            showToast={showToast}
+                        >
+                            <button onClick={() => { handleDelete(selectedBike.id); }} className="w-full flex items-center text-left p-4 bg-gray-700/80 hover:bg-gray-700 rounded-lg text-white text-lg">
+                                <TrashIcon className="w-6 h-6 mr-4 text-red-400"/> Eliminar
+                            </button>
+                        </ProtectedAction>
                     </div>
                 </ActionSheet>
             )}
