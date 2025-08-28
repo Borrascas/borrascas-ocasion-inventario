@@ -9,6 +9,8 @@ interface ImageViewerProps {
 }
 
 const ImageViewer: React.FC<ImageViewerProps> = ({ isOpen, onClose, imageUrl, altText }) => {
+    if (!isOpen) return null;
+
     const [scale, setScale] = useState(1);
     const [position, setPosition] = useState({ x: 0, y: 0 });
     const [isDragging, setIsDragging] = useState(false);
@@ -18,17 +20,15 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ isOpen, onClose, imageUrl, al
     const containerRef = useRef<HTMLDivElement>(null);
     const imageRef = useRef<HTMLImageElement>(null);
 
-    // Reset cuando se abre
+    // Reset cuando se abre (solo se ejecuta cuando isOpen es true)
     useEffect(() => {
-        if (isOpen) {
-            setScale(1);
-            setPosition({ x: 0, y: 0 });
-            setIsDragging(false);
-            setIsTouch(false);
-        }
-    }, [isOpen]);
+        setScale(1);
+        setPosition({ x: 0, y: 0 });
+        setIsDragging(false);
+        setIsTouch(false);
+    }, []); // Solo al montar cuando isOpen=true
 
-    // Cerrar con ESC
+    // Cerrar con ESC (solo se ejecuta cuando isOpen es true)
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key === 'Escape') {
@@ -36,14 +36,12 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ isOpen, onClose, imageUrl, al
             }
         };
 
-        if (isOpen) {
-            document.addEventListener('keydown', handleKeyDown);
-        }
+        document.addEventListener('keydown', handleKeyDown);
 
         return () => {
             document.removeEventListener('keydown', handleKeyDown);
         };
-    }, [isOpen, onClose]);
+    }, [onClose]);
 
     // Calcular distancia entre dos puntos táctiles
     const getTouchDistance = (touches: TouchList) => {
@@ -168,8 +166,6 @@ const ImageViewer: React.FC<ImageViewerProps> = ({ isOpen, onClose, imageUrl, al
             setTimeout(() => setIsTouch(false), 100);
         }
     };
-
-    if (!isOpen) return null;
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
