@@ -44,11 +44,16 @@ const Inventory: React.FC<Props> = ({ showToast, permissions }) => {
     }
 
     const { allBrands, allModels } = useMemo(() => {
+        // Verificación de seguridad
+        if (!bikes || !Array.isArray(bikes)) {
+            return { allBrands: [], allModels: [] };
+        }
+        
         const brandSet = new Set<string>();
         const modelSet = new Set<string>();
         bikes.forEach(bike => {
-            if (bike.brand) brandSet.add(bike.brand);
-            if (bike.model) modelSet.add(bike.model);
+            if (bike?.brand) brandSet.add(bike.brand);
+            if (bike?.model) modelSet.add(bike.model);
         });
         return {
             allBrands: Array.from(brandSet).sort(),
@@ -57,7 +62,12 @@ const Inventory: React.FC<Props> = ({ showToast, permissions }) => {
     }, [bikes]);
 
     const filteredBikes = useMemo(() => {
-        let bikesToFilter = bikes;
+        // Verificación de seguridad para evitar errores si bikes no está definido
+        if (!bikes || !Array.isArray(bikes)) {
+            return [];
+        }
+        
+        let bikesToFilter = [...bikes]; // Crear copia para evitar mutación
 
         if (statusFilter !== 'All') {
             bikesToFilter = bikesToFilter.filter(bike => bike.status === statusFilter);
@@ -70,15 +80,20 @@ const Inventory: React.FC<Props> = ({ showToast, permissions }) => {
         if (searchQuery) {
             const lowercasedQuery = searchQuery.toLowerCase();
             bikesToFilter = bikesToFilter.filter(bike => 
-                bike.refNumber.toLowerCase().includes(lowercasedQuery) ||
-                `${bike.brand} ${bike.model}`.toLowerCase().includes(lowercasedQuery) ||
-                bike.model.toLowerCase().includes(lowercasedQuery) ||
+                bike.refNumber?.toLowerCase().includes(lowercasedQuery) ||
+                `${bike.brand || ''} ${bike.model || ''}`.toLowerCase().includes(lowercasedQuery) ||
+                bike.model?.toLowerCase().includes(lowercasedQuery) ||
                 (bike.serialNumber && bike.serialNumber.toLowerCase().includes(lowercasedQuery))
             );
         }
 
         // Asegurar orden por refNumber después de filtros (más recientes primero)
-        return bikesToFilter.sort((a, b) => b.refNumber.localeCompare(a.refNumber));
+        return bikesToFilter.sort((a, b) => {
+            // Verificación adicional para refNumber
+            const aRef = a.refNumber || '';
+            const bRef = b.refNumber || '';
+            return bRef.localeCompare(aRef);
+        });
     }, [bikes, searchQuery, statusFilter, typeFilter]);
 
     const handleOpenActions = (bike: Bike) => {
