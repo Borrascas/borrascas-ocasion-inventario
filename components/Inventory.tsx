@@ -35,14 +35,6 @@ const Inventory: React.FC<Props> = ({ showToast, permissions }) => {
     const [statusFilter, setStatusFilter] = useState<BikeStatus | 'All'>('All');
     const [typeFilter, setTypeFilter] = useState<BikeType | 'All'>('All');
 
-    if (isLoading) {
-        return (
-            <div className="flex items-center justify-center h-screen">
-                <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
-            </div>
-        );
-    }
-
     const { allBrands, allModels } = useMemo(() => {
         // Verificación de seguridad
         if (!bikes || !Array.isArray(bikes)) {
@@ -95,6 +87,15 @@ const Inventory: React.FC<Props> = ({ showToast, permissions }) => {
             return bRef.localeCompare(aRef);
         });
     }, [bikes, searchQuery, statusFilter, typeFilter]);
+
+    // Early return DESPUÉS de todos los hooks
+    if (isLoading) {
+        return (
+            <div className="flex items-center justify-center h-screen">
+                <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
+            </div>
+        );
+    }
 
     const handleOpenActions = (bike: Bike) => {
         setSelectedBike(bike);
