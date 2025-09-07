@@ -35,7 +35,7 @@ export const useBikes = () => {
                     tradeInBikeId,
                     tradeInForBikeId
                 `)
-                .order('entryDate', { ascending: false });
+                .order('refNumber', { ascending: false });
 
             if (error) {
                 console.error('Error fetching bikes:', error);

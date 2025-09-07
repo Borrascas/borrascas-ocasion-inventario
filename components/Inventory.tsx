@@ -67,15 +67,18 @@ const Inventory: React.FC<Props> = ({ showToast, permissions }) => {
             bikesToFilter = bikesToFilter.filter(bike => bike.type === typeFilter);
         }
 
-        if (!searchQuery) return bikesToFilter;
-        
-        const lowercasedQuery = searchQuery.toLowerCase();
-        return bikesToFilter.filter(bike => 
-            bike.refNumber.toLowerCase().includes(lowercasedQuery) ||
-            `${bike.brand} ${bike.model}`.toLowerCase().includes(lowercasedQuery) ||
-            bike.model.toLowerCase().includes(lowercasedQuery) ||
-            (bike.serialNumber && bike.serialNumber.toLowerCase().includes(lowercasedQuery))
-        );
+        if (searchQuery) {
+            const lowercasedQuery = searchQuery.toLowerCase();
+            bikesToFilter = bikesToFilter.filter(bike => 
+                bike.refNumber.toLowerCase().includes(lowercasedQuery) ||
+                `${bike.brand} ${bike.model}`.toLowerCase().includes(lowercasedQuery) ||
+                bike.model.toLowerCase().includes(lowercasedQuery) ||
+                (bike.serialNumber && bike.serialNumber.toLowerCase().includes(lowercasedQuery))
+            );
+        }
+
+        // Asegurar orden por refNumber después de filtros (más recientes primero)
+        return bikesToFilter.sort((a, b) => b.refNumber.localeCompare(a.refNumber));
     }, [bikes, searchQuery, statusFilter, typeFilter]);
 
     const handleOpenActions = (bike: Bike) => {
