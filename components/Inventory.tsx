@@ -1,5 +1,5 @@
 
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { Bike, BikeStatus, SaleData, BikeType, BikeFormData, UserPermissions } from '../types';
 import { useBikes, useCreateBike, useUpdateBike, useDeleteBike, useSellBike } from '../services/bikeQueries';
 import { STATUS_COLORS, STATUS_BADGE_COLORS, BIKE_STATUS_TRANSLATIONS, BIKE_TYPE_TRANSLATIONS, BIKE_TYPE_OPTIONS } from '../constants';
@@ -35,31 +35,31 @@ const Inventory: React.FC<Props> = ({ showToast, permissions }) => {
     const [statusFilter, setStatusFilter] = useState<BikeStatus | 'All'>('All');
     const [typeFilter, setTypeFilter] = useState<BikeType | 'All'>('All');
 
-    const { allBrands, allModels } = useMemo(() => {
-        // Verificación de seguridad
-        if (!bikes || !Array.isArray(bikes)) {
-            return { allBrands: [], allModels: [] };
-        }
-        
-        const brandSet = new Set<string>();
-        const modelSet = new Set<string>();
+    // Early return ANTES de cualquier lógica compleja
+    if (isLoading) {
+        return (
+            <div className="flex items-center justify-center h-screen">
+                <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
+            </div>
+        );
+    }
+
+    // Calcular brands y models directamente sin useMemo
+    const brandSet = new Set<string>();
+    const modelSet = new Set<string>();
+    if (bikes && Array.isArray(bikes)) {
         bikes.forEach(bike => {
             if (bike?.brand) brandSet.add(bike.brand);
             if (bike?.model) modelSet.add(bike.model);
         });
-        return {
-            allBrands: Array.from(brandSet).sort(),
-            allModels: Array.from(modelSet).sort(),
-        };
-    }, [bikes]);
+    }
+    const allBrands = Array.from(brandSet).sort();
+    const allModels = Array.from(modelSet).sort();
 
-    const filteredBikes = useMemo(() => {
-        // Verificación de seguridad para evitar errores si bikes no está definido
-        if (!bikes || !Array.isArray(bikes)) {
-            return [];
-        }
-        
-        let bikesToFilter = [...bikes]; // Crear copia para evitar mutación
+    // Calcular filteredBikes directamente sin useMemo
+    let filteredBikes: Bike[] = [];
+    if (bikes && Array.isArray(bikes)) {
+        let bikesToFilter = [...bikes];
 
         if (statusFilter !== 'All') {
             bikesToFilter = bikesToFilter.filter(bike => bike.status === statusFilter);
@@ -79,22 +79,12 @@ const Inventory: React.FC<Props> = ({ showToast, permissions }) => {
             );
         }
 
-        // Asegurar orden por refNumber después de filtros (más recientes primero)
-        return bikesToFilter.sort((a, b) => {
-            // Verificación adicional para refNumber
+        // Ordenar por refNumber (más recientes primero)
+        filteredBikes = bikesToFilter.sort((a, b) => {
             const aRef = a.refNumber || '';
             const bRef = b.refNumber || '';
             return bRef.localeCompare(aRef);
         });
-    }, [bikes, searchQuery, statusFilter, typeFilter]);
-
-    // Early return DESPUÉS de todos los hooks
-    if (isLoading) {
-        return (
-            <div className="flex items-center justify-center h-screen">
-                <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
-            </div>
-        );
     }
 
     const handleOpenActions = (bike: Bike) => {
@@ -128,13 +118,12 @@ const Inventory: React.FC<Props> = ({ showToast, permissions }) => {
         setConfirmDeleteModalOpen(true);
     };
 
-    const nextRefNumber = useMemo(() => {
-        const maxRef = bikes.reduce((max, b) => {
-            const refNum = parseInt(b.refNumber, 10);
-            return isNaN(refNum) ? max : Math.max(max, refNum);
-        }, 0);
-        return (maxRef + 1).toString().padStart(4, '0');
-    }, [bikes]);
+    // Calcular nextRefNumber directamente
+    const maxRef = bikes && Array.isArray(bikes) ? bikes.reduce((max, b) => {
+        const refNum = parseInt(b.refNumber, 10);
+        return isNaN(refNum) ? max : Math.max(max, refNum);
+    }, 0) : 0;
+    const nextRefNumber = (maxRef + 1).toString().padStart(4, '0');
 
 
     const handleSaveBike = async (bikeData: BikeFormData & { id?: number }) => {
