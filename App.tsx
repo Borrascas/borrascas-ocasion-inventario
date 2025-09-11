@@ -6,6 +6,7 @@ import Dashboard from './components/Dashboard';
 import Inventory from './components/Inventory';
 import Header from './components/Header';
 import ToastContainer from './components/ui/Toast';
+import InstallPrompt from './components/ui/InstallPrompt';
 import { Toast } from './types';
 import Loaners from './components/Loaners';
 import { AlertCircleIcon } from './components/ui/Icons';
@@ -16,6 +17,7 @@ import PendingApproval from './components/PendingApproval';
 import { queryClient } from './services/queryClient';
 import { Session } from '@supabase/supabase-js';
 import { useUserPermissions } from './services/userService';
+import { useInstallPrompt } from './services/useInstallPrompt';
 import { UserRole } from './types';
 
 const LoadingSpinner: React.FC = () => {
@@ -31,6 +33,7 @@ const AuthenticatedApp: React.FC<{ session: Session }> = ({ session }) => {
     const { permissions, userProfile, loading } = useUserPermissions();
     const [isSidebarOpen, setSidebarOpen] = useState(false);
     const [toasts, setToasts] = useState<Toast[]>([]);
+    const { showInstallPrompt, installApp, dismissPrompt } = useInstallPrompt();
 
     const showToast = useCallback((message: string, options: { type?: 'success' | 'error', icon?: React.ReactNode | null } = {}) => {
         const { type = 'success', icon: rawIcon } = options;
@@ -65,6 +68,12 @@ const AuthenticatedApp: React.FC<{ session: Session }> = ({ session }) => {
         <QueryClientProvider client={queryClient}>
             <HashRouter>
                 <ToastContainer toasts={toasts} />
+                {showInstallPrompt && (
+                    <InstallPrompt 
+                        onInstall={installApp}
+                        onDismiss={dismissPrompt}
+                    />
+                )}
                 <div className="flex min-h-screen bg-gray-900 text-gray-100" style={{ minHeight: '-webkit-fill-available' }}>
                     <Sidebar isOpen={isSidebarOpen} setIsOpen={setSidebarOpen} permissions={permissions} showToast={showToast} />
                     <div className="flex-1 flex flex-col">
