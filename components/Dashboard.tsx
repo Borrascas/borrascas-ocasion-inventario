@@ -4,7 +4,7 @@ import Loading from './ui/Loading';
 import { Bike, BikeStatus, BikeType } from '../types';
 import { PIE_CHART_COLORS, BIKE_STATUS_TRANSLATIONS, BIKE_TYPE_COLORS, BIKE_TYPE_TRANSLATIONS } from '../constants';
 import { formatCurrency, calculateDaysBetween, calculateProfitMargin } from '../services/helpers';
-import { AlertTriangleIcon } from './ui/Icons';
+import { AlertTriangleIcon, SearchIcon } from './ui/Icons';
 import { useBikes } from '../services/bikeQueries';
 
 const monthNames = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
@@ -126,6 +126,22 @@ const Dashboard: React.FC = () => {
 
     // State
     const [selectedYear, setSelectedYear] = useState(historicalData.currentYear);
+    const [queryMonth, setQueryMonth] = useState('');
+    const [queryYear, setQueryYear] = useState('');
+
+    // Query for specific month/year bikes sold
+    const queriedBikes = useMemo(() => {
+        if (!queryMonth || !queryYear) return [];
+        
+        const targetMonth = parseInt(queryMonth) - 1; // JavaScript months are 0-indexed
+        const targetYear = parseInt(queryYear);
+        
+        return soldBikes.filter(bike => {
+            if (!bike.soldDate) return false;
+            const soldDate = new Date(bike.soldDate);
+            return soldDate.getMonth() === targetMonth && soldDate.getFullYear() === targetYear;
+        });
+    }, [soldBikes, queryMonth, queryYear]);
 
     // Other calculations
     const kpis = useMemo(() => {
@@ -568,6 +584,165 @@ const Dashboard: React.FC = () => {
                             </div>
                         )}
                     </div>
+                </div>
+            </CardContainer>
+
+            {/* Consulta de Ventas por Mes/Año */}
+            <CardContainer>
+                <div className="space-y-6">
+                    <h3 className="text-xl font-semibold text-white">Consulta de Ventas por Mes</h3>
+                    
+                    {/* Filtros */}
+                    <div className="flex flex-col items-center space-y-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full max-w-2xl">
+                            <div>
+                                <label htmlFor="queryMonth" className="block text-sm font-medium text-gray-400 mb-2 text-center">
+                                    Mes
+                                </label>
+                                <select
+                                    id="queryMonth"
+                                    value={queryMonth}
+                                    onChange={(e) => setQueryMonth(e.target.value)}
+                                    className="w-full bg-gray-700/80 border border-gray-600 rounded-lg shadow-sm text-white focus:ring-blue-500 focus:border-blue-500 px-3 py-2 text-center"
+                                >
+                                    <option value="">Seleccionar mes</option>
+                                    <option value="1">Enero</option>
+                                    <option value="2">Febrero</option>
+                                    <option value="3">Marzo</option>
+                                    <option value="4">Abril</option>
+                                    <option value="5">Mayo</option>
+                                    <option value="6">Junio</option>
+                                    <option value="7">Julio</option>
+                                    <option value="8">Agosto</option>
+                                    <option value="9">Septiembre</option>
+                                    <option value="10">Octubre</option>
+                                    <option value="11">Noviembre</option>
+                                    <option value="12">Diciembre</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label htmlFor="queryYear" className="block text-sm font-medium text-gray-400 mb-2 text-center">
+                                    Año
+                                </label>
+                                <select
+                                    id="queryYear"
+                                    value={queryYear}
+                                    onChange={(e) => setQueryYear(e.target.value)}
+                                    className="w-full bg-gray-700/80 border border-gray-600 rounded-lg shadow-sm text-white focus:ring-blue-500 focus:border-blue-500 px-3 py-2 text-center"
+                                >
+                                    <option value="">Seleccionar año</option>
+                                    {/* Generar años desde 2025 hasta el año actual + 1 */}
+                                    {Array.from({ length: (new Date().getFullYear() + 1) - 2025 + 1 }, (_, i) => 2025 + i)
+                                        .map(year => (
+                                            <option key={year} value={year}>{year}</option>
+                                        ))
+                                    }
+                                </select>
+                            </div>
+                            
+                            <div className="flex items-end justify-center sm:col-span-2 lg:col-span-1">
+                                <button
+                                    onClick={() => {
+                                        setQueryMonth('');
+                                        setQueryYear('');
+                                    }}
+                                    className="px-6 py-2 bg-gray-600 hover:bg-gray-500 text-white rounded-lg transition-colors duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                                    disabled={!queryMonth && !queryYear}
+                                >
+                                    Limpiar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Resultados */}
+                    {queryMonth && queryYear ? (
+                        <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                                <h4 className="text-lg font-semibold text-white">
+                                    Ventas de {['', 'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'][parseInt(queryMonth)]} {queryYear}
+                                </h4>
+                                <span className="text-sm text-gray-400">
+                                    Total: {queriedBikes.length} bicicleta{queriedBikes.length !== 1 ? 's' : ''}
+                                </span>
+                            </div>
+                            
+                            {queriedBikes.length > 0 ? (
+                                <div className="space-y-3">
+                                    {/* Tabla para escritorio */}
+                                    <div className="hidden md:block overflow-x-auto">
+                                        <table className="w-full text-left">
+                                            <thead className="bg-gray-900/50">
+                                                <tr>
+                                                    <th className="p-3 font-semibold text-gray-300">Referencia</th>
+                                                    <th className="p-3 font-semibold text-gray-300">Marca</th>
+                                                    <th className="p-3 font-semibold text-gray-300">Modelo</th>
+                                                    <th className="p-3 font-semibold text-gray-300">Fecha de Venta</th>
+                                                    <th className="p-3 font-semibold text-gray-300 text-right">Precio Final</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {queriedBikes.map((bike) => (
+                                                    <tr key={bike.refNumber} className="border-t border-gray-700/50 hover:bg-gray-800/30 transition-colors">
+                                                        <td className="p-3 text-white font-mono font-semibold">
+                                                            #{bike.refNumber}
+                                                        </td>
+                                                        <td className="p-3 text-gray-300">
+                                                            {bike.brand}
+                                                        </td>
+                                                        <td className="p-3 text-gray-300">
+                                                            {bike.model}
+                                                        </td>
+                                                        <td className="p-3 text-gray-400 text-sm">
+                                                            {bike.soldDate ? new Date(bike.soldDate).toLocaleDateString('es-ES') : '-'}
+                                                        </td>
+                                                        <td className="p-3 text-green-400 font-semibold text-right">
+                                                            {formatCurrency(bike.finalSellPrice || 0)}
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    {/* Cards para móvil */}
+                                    <div className="md:hidden space-y-3">
+                                        {queriedBikes.map((bike) => (
+                                            <div key={bike.refNumber} className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50">
+                                                <div className="flex justify-between items-start mb-2">
+                                                    <span className="text-white font-mono font-bold text-lg">
+                                                        #{bike.refNumber}
+                                                    </span>
+                                                    <span className="text-green-400 font-semibold">
+                                                        {formatCurrency(bike.finalSellPrice || 0)}
+                                                    </span>
+                                                </div>
+                                                <div className="space-y-1">
+                                                    <div className="text-gray-300">
+                                                        <span className="font-medium">{bike.brand}</span> {bike.model}
+                                                    </div>
+                                                    <div className="text-gray-400 text-sm">
+                                                        {bike.soldDate ? new Date(bike.soldDate).toLocaleDateString('es-ES') : '-'}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="text-center py-8 text-gray-400">
+                                    <AlertTriangleIcon className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                                    <p>No se encontraron ventas para el mes y año seleccionados.</p>
+                                </div>
+                            )}
+                        </div>
+                    ) : (
+                        <div className="text-center py-8 text-gray-400">
+                            <SearchIcon className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                            <p>Selecciona un mes y año para ver las bicis vendidas en ese período.</p>
+                        </div>
+                    )}
                 </div>
             </CardContainer>
         </div>

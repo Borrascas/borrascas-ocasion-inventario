@@ -4,7 +4,6 @@ import Modal from './ui/Modal';
 import * as Icons from './ui/Icons';
 import { BIKE_TYPE_OPTIONS } from '../constants';
 import { capitalizeFirstLetter, uploadImageToSupabase } from '../services/helpers';
-import AutocompleteInput from './ui/AutocompleteInput';
 import { supabase } from '../services/supabaseClient';
 
 interface BikeFormModalProps {
@@ -60,10 +59,6 @@ const BikeFormModal: React.FC<BikeFormModalProps> = ({ isOpen, onClose, onSave, 
         } else {
             setFormData(prev => ({ ...prev, [name]: value }));
         }
-    };
-    
-    const handleAutocompleteChange = (name: 'brand' | 'model', value: string) => {
-         setFormData(prev => ({ ...prev, [name]: capitalizeFirstLetter(value) }));
     };
 
     const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -151,20 +146,26 @@ const BikeFormModal: React.FC<BikeFormModalProps> = ({ isOpen, onClose, onSave, 
                 <div className="grid grid-cols-2 gap-4">
                     <div>
                         <label htmlFor="brand" className="block text-sm font-medium text-gray-300">Marca</label>
-                        <AutocompleteInput
-                            value={formData.brand || ''}
-                            onValueChange={(value) => handleAutocompleteChange('brand', value)}
-                            suggestions={allBrands}
-                            required
+                        <input 
+                            type="text" 
+                            name="brand" 
+                            id="brand" 
+                            value={formData.brand || ''} 
+                            onChange={handleChange} 
+                            required 
+                            className="mt-1 block w-full bg-gray-700 border-gray-600 rounded-md shadow-sm text-white focus:ring-blue-500 focus:border-blue-500" 
                         />
                     </div>
                     <div>
                         <label htmlFor="model" className="block text-sm font-medium text-gray-300">Modelo</label>
-                        <AutocompleteInput
-                            value={formData.model || ''}
-                            onValueChange={(value) => handleAutocompleteChange('model', value)}
-                            suggestions={allModels}
-                            required
+                        <input 
+                            type="text" 
+                            name="model" 
+                            id="model" 
+                            value={formData.model || ''} 
+                            onChange={handleChange} 
+                            required 
+                            className="mt-1 block w-full bg-gray-700 border-gray-600 rounded-md shadow-sm text-white focus:ring-blue-500 focus:border-blue-500" 
                         />
                     </div>
                 </div>
