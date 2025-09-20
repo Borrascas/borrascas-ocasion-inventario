@@ -20,7 +20,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, permissions, showT
         let errorMessage = "";
 
         switch (item.path) {
-            case '/':
+            case '/dashboard':
                 hasPermission = permissions.canView;
                 errorMessage = "No tienes permisos para ver el panel principal";
                 break;
@@ -63,7 +63,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, permissions, showT
                    style={{ height: '-webkit-fill-available' }}>
                 <div>
                     <div className="flex items-center justify-between p-4 border-b border-gray-700/50 h-[73px]">
-                        <NavLink to="/" onClick={() => setIsOpen(false)}>
+                        <NavLink to="/inventory" onClick={() => setIsOpen(false)}>
                             <img src={logoSrc} alt="Borrascas Bicicletas Ocasión Logo" className="h-full object-contain" />
                         </NavLink>
                          <button onClick={() => setIsOpen(false)} 

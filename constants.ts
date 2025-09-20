@@ -54,7 +54,7 @@ export const BIKE_TYPE_OPTIONS = Object.values(BikeType).map(type => ({
 
 
 export const NAV_ITEMS = [
-    { name: 'Panel', path: '/', icon: DashboardIcon },
+    { name: 'Panel', path: '/dashboard', icon: DashboardIcon },
     { name: 'Inventario', path: '/inventory', icon: InventoryIcon },
     { name: 'Préstamos', path: '/loaners', icon: UsersIcon },
     { name: 'Ajustes', path: '/settings', icon: SettingsIcon },

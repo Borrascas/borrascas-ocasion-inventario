@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { HashRouter, Routes, Route } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClientProvider } from '@tanstack/react-query';
 import Sidebar from './components/Sidebar';
 import Dashboard from './components/Dashboard';
@@ -80,7 +80,8 @@ const AuthenticatedApp: React.FC<{ session: Session }> = ({ session }) => {
                         <Header toggleSidebar={() => setSidebarOpen(!isSidebarOpen)} />
                         <main className="flex-1 bg-gray-800 p-4 md:p-6 lg:p-8">
                             <Routes>
-                                <Route path="/" element={<Dashboard permissions={permissions} />} />
+                                <Route path="/" element={<Navigate to="/inventory" replace />} />
+                                <Route path="/dashboard" element={<Dashboard permissions={permissions} />} />
                                 <Route path="/inventory" element={<Inventory showToast={showToast} permissions={permissions} />} />
                                 <Route path="/loaners" element={<Loaners permissions={permissions} showToast={showToast} />} />
                                 <Route path="/settings" element={<Settings permissions={permissions} userProfile={userProfile} />} />
