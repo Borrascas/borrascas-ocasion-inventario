@@ -3,7 +3,6 @@ import { Bike, SaleType, SaleData, BikeType, BikeStatus } from '../types';
 import Modal from './ui/Modal';
 import { BIKE_TYPE_OPTIONS } from '../constants';
 import { capitalizeFirstLetter, uploadImageToSupabase } from '../services/helpers';
-import AutocompleteInput from './ui/AutocompleteInput';
 import { BikePlaceholderIcon } from './ui/Icons';
 
 interface SellBikeModalProps {
@@ -11,14 +10,12 @@ interface SellBikeModalProps {
     onClose: () => void;
     onConfirmSale: (saleData: SaleData) => void;
     bike: Bike;
-    allBrands: string[];
-    allModels: string[];
     nextRefNumber: string;
 }
 
 type TradeInBikeData = Omit<Bike, 'id' | 'status' | 'refNumber'>;
 
-const SellBikeModal: React.FC<SellBikeModalProps> = ({ isOpen, onClose, onConfirmSale, bike, allBrands, allModels, nextRefNumber }) => {
+const SellBikeModal: React.FC<SellBikeModalProps> = ({ isOpen, onClose, onConfirmSale, bike, nextRefNumber }) => {
     // These form states will hold prices in euros for the inputs.
     const [saleType, setSaleType] = useState<SaleType>(SaleType.Cash);
     const [cashPortion, setCashPortion] = useState<number | undefined>(undefined);
@@ -49,15 +46,11 @@ const SellBikeModal: React.FC<SellBikeModalProps> = ({ isOpen, onClose, onConfir
             setTradeInBike(prev => ({ ...prev, [name]: value === '' ? undefined : parseFloat(value) }));
         } else if (name === 'serialNumber') {
             setTradeInBike(prev => ({ ...prev, [name]: value.toUpperCase() }));
-        } else if (['size', 'observations'].includes(name)) {
+        } else if (['size', 'observations', 'brand', 'model'].includes(name)) {
             setTradeInBike(prev => ({ ...prev, [name]: capitalizeFirstLetter(value) }));
         } else {
             setTradeInBike(prev => ({ ...prev, [name]: value }));
         }
-    };
-
-    const handleTradeInAutocompleteChange = (name: 'brand' | 'model', value: string) => {
-        setTradeInBike(prev => ({ ...prev, [name]: capitalizeFirstLetter(value) }));
     };
     
     const handleCashPortionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -188,11 +181,25 @@ const SellBikeModal: React.FC<SellBikeModalProps> = ({ isOpen, onClose, onConfir
                         <div className="grid grid-cols-2 gap-4">
                              <div>
                                 <label className="block text-sm font-medium text-gray-300">Marca</label>
-                                <AutocompleteInput value={tradeInBike.brand || ''} onValueChange={(v) => handleTradeInAutocompleteChange('brand', v)} suggestions={allBrands} required />
+                                <input 
+                                    type="text" 
+                                    name="brand" 
+                                    value={tradeInBike.brand || ''} 
+                                    onChange={handleTradeInChange} 
+                                    required 
+                                    className="mt-1 block w-full bg-gray-700 border-gray-600 rounded-md shadow-sm text-white focus:ring-blue-500 focus:border-blue-500" 
+                                />
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-300">Modelo</label>
-                                <AutocompleteInput value={tradeInBike.model || ''} onValueChange={(v) => handleTradeInAutocompleteChange('model', v)} suggestions={allModels} required />
+                                <input 
+                                    type="text" 
+                                    name="model" 
+                                    value={tradeInBike.model || ''} 
+                                    onChange={handleTradeInChange} 
+                                    required 
+                                    className="mt-1 block w-full bg-gray-700 border-gray-600 rounded-md shadow-sm text-white focus:ring-blue-500 focus:border-blue-500" 
+                                />
                             </div>
                         </div>
 

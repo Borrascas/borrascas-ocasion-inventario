@@ -398,8 +398,6 @@ const Inventory: React.FC<Props> = ({ showToast, permissions }) => {
                     onClose={() => setSellModalOpen(false)}
                     onConfirmSale={handleConfirmSale}
                     bike={selectedBike}
-                    allBrands={allBrands}
-                    allModels={allModels}
                     nextRefNumber={nextRefNumber}
                 />
             )}
