@@ -231,7 +231,7 @@ const Inventory: React.FC<Props> = ({ showToast, permissions }) => {
                             </span>
                         </div>
                         <h3 className="font-bold text-white text-sm mt-1 leading-tight">{bike.brand} {bike.model}</h3>
-                        <p className="text-xs text-gray-400">{BIKE_TYPE_TRANSLATIONS[bike.type]} - Talla: {bike.size}</p>
+                        <p className="text-xs text-gray-400">Talla: {bike.size}</p>
                     </div>
                     <div className="flex justify-between items-end mt-2 gap-2">
                         <div className="flex-1">
