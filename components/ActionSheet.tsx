@@ -33,10 +33,19 @@ const ActionSheet: React.FC<ActionSheetProps> = ({ isOpen, onClose, children }) 
             
             {/* Sheet */}
             <div
-                className={`w-full max-w-md bg-gray-800 border-t border-gray-700/50 rounded-t-2xl shadow-2xl p-4 ${isOpen ? 'animate-sheet-in' : 'animate-sheet-out'}`}
+                className={`w-full max-w-md rounded-t-2xl shadow-2xl p-4 ${isOpen ? 'animate-sheet-in' : 'animate-sheet-out'}`}
                 onAnimationEnd={handleAnimationEnd}
+                style={{
+                    background: 'rgba(15, 23, 42, 0.95)',
+                    backdropFilter: 'blur(24px)',
+                    WebkitBackdropFilter: 'blur(24px)',
+                    borderTop: '1px solid rgba(51, 65, 85, 0.5)',
+                    borderLeft: '1px solid rgba(51, 65, 85, 0.3)',
+                    borderRight: '1px solid rgba(51, 65, 85, 0.3)',
+                }}
             >
-                <div className="mx-auto w-12 h-1.5 flex-shrink-0 rounded-full bg-gray-600 mb-4" />
+                <div className="mx-auto w-10 h-1 flex-shrink-0 rounded-full mb-4" 
+                     style={{ background: 'linear-gradient(90deg, rgba(99, 102, 241, 0.4), rgba(56, 189, 248, 0.4))' }} />
                 {children}
             </div>
         </div>

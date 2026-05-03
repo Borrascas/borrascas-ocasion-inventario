@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { XIcon } from './ui/Icons';
 import { NAV_ITEMS } from '../constants';
 import { UserPermissions } from '../types';
@@ -13,6 +13,7 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, permissions, showToast }) => {
     const logoSrc = "/logo.png";
+    const location = useLocation();
 
     const handleNavClick = (item: any, e: React.MouseEvent) => {
         // Verificar permisos según la ruta
@@ -53,54 +54,60 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, permissions, showT
 
     return (
         <>
-            <div className={`fixed inset-0 bg-black/60 z-30 md:hidden ${isOpen ? 'block' : 'hidden'}`} 
+            <div className={`fixed inset-0 bg-black/60 backdrop-blur-sm z-30 md:hidden transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`} 
                  onClick={() => setIsOpen(false)}
                  style={{ 
                      WebkitTapHighlightColor: 'transparent',
                      touchAction: 'manipulation'
                  }}></div>
-            <aside className={`absolute md:relative z-40 md:z-auto w-64 bg-gray-900 border-r border-gray-700/50 h-full transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col`}
-                   style={{ height: '-webkit-fill-available' }}>
+            <aside className={`absolute md:relative z-40 md:z-auto w-64 h-full transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col`}
+                   style={{ 
+                       height: '-webkit-fill-available',
+                       background: 'linear-gradient(180deg, rgba(15, 23, 42, 0.98) 0%, rgba(15, 23, 42, 0.95) 100%)',
+                       borderRight: '1px solid rgba(51, 65, 85, 0.4)',
+                   }}>
                 <div>
-                    <div className="flex items-center justify-between p-4 border-b border-gray-700/50 h-[73px]">
+                    <div className="flex items-center justify-between p-4 h-[60px]" style={{ borderBottom: '1px solid rgba(51, 65, 85, 0.3)' }}>
                         <NavLink to="/inventory" onClick={() => setIsOpen(false)}>
                             <img src={logoSrc} alt="Borrascas Bicicletas Ocasión Logo" className="h-full object-contain" />
                         </NavLink>
                          <button onClick={() => setIsOpen(false)} 
-                                className="md:hidden p-1 rounded-full hover:bg-gray-700 active:bg-gray-600"
+                                className="md:hidden p-1.5 rounded-lg hover:bg-gray-700/50 active:bg-gray-600/50 transition-colors"
                                 style={{ 
                                     WebkitTapHighlightColor: 'transparent',
                                     touchAction: 'manipulation'
                                 }}>
-                            <XIcon className="w-6 h-6" />
+                            <XIcon className="w-5 h-5 text-gray-400" />
                         </button>
                     </div>
-                    <nav className="mt-6">
-                        <ul>
+                    <nav className="mt-6 px-3">
+                        <ul className="space-y-1">
                             {NAV_ITEMS.map((item) => {
                                 const Icon = item.icon;
                                 const hasPermission = item.path === '/settings' || permissions.canView;
+                                const isActive = location.pathname === item.path || 
+                                    (item.path === '/inventory' && location.pathname === '/');
                                 
                                 return (
-                                    <li key={item.name} className="px-4 mb-2">
+                                    <li key={item.name}>
                                         <NavLink
                                             to={item.path}
                                             onClick={(e) => handleNavClick(item, e)}
                                             end={item.path === '/'}
-                                            className={({ isActive }) =>
-                                                `flex items-center p-3 rounded-lg transition-colors duration-200 ${
+                                            className={
+                                                `flex items-center p-3 rounded-xl transition-all duration-200 group ${
                                                     isActive
-                                                        ? 'bg-blue-600 text-white shadow-lg'
+                                                        ? 'nav-active-glow text-white font-semibold'
                                                         : hasPermission 
-                                                            ? 'text-gray-400 hover:bg-gray-700/50 hover:text-white'
-                                                            : 'text-gray-500 hover:bg-gray-700/30 cursor-not-allowed opacity-60'
+                                                            ? 'text-gray-400 hover:bg-gray-800/60 hover:text-gray-200'
+                                                            : 'text-gray-600 hover:bg-gray-800/30 cursor-not-allowed opacity-60'
                                                 }`
                                             }
                                         >
-                                            <Icon className="w-6 h-6 mr-3" />
-                                            <span className="font-medium">{item.name}</span>
+                                            <Icon className={`w-5 h-5 mr-3 transition-colors ${isActive ? 'text-blue-400' : 'text-gray-500 group-hover:text-gray-400'}`} />
+                                            <span className="text-sm">{item.name}</span>
                                             {!hasPermission && (
-                                                <span className="ml-auto text-xs">🔒</span>
+                                                <span className="ml-auto text-xs opacity-50">🔒</span>
                                             )}
                                         </NavLink>
                                     </li>
@@ -108,6 +115,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, permissions, showT
                             })}
                         </ul>
                     </nav>
+                </div>
+                {/* Bottom decoration */}
+                <div className="mt-auto p-4">
+                    <div className="h-px w-full" style={{ background: 'linear-gradient(90deg, transparent, rgba(51, 65, 85, 0.4), transparent)' }} />
+                    <p className="text-center text-xs text-gray-600 mt-3 tracking-wider">BORRASCAS OCASIÓN</p>
                 </div>
             </aside>
         </>

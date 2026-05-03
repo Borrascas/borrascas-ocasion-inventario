@@ -262,7 +262,6 @@ const Dashboard: React.FC = () => {
     if (isSetupError && setupError) {
         return (
             <div className="space-y-8">
-                <h2 className="text-3xl font-bold text-white">Panel de Control</h2>
                 <div className="text-center py-20 bg-red-900/20 rounded-xl border border-dashed border-red-500/50 animate-fade-in">
                     <AlertTriangleIcon className="w-16 h-16 mx-auto text-red-400" />
                     <h3 className="mt-4 text-xl font-semibold text-white">Error de Configuración</h3>
@@ -277,7 +276,6 @@ const Dashboard: React.FC = () => {
     if (!bikes || bikes.length === 0) {
         return (
             <div className="space-y-8">
-                <h2 className="text-3xl font-bold text-white">Panel de Control</h2>
                 <div className="text-center py-20 bg-gray-800/50 rounded-xl border border-dashed border-gray-700">
                     <h3 className="text-xl font-semibold text-white">Aún no hay datos</h3>
                     <p className="text-gray-400 mt-2">Añade tu primera bicicleta en la sección de 'Inventario' para ver las estadísticas.</p>
@@ -289,7 +287,6 @@ const Dashboard: React.FC = () => {
     // Main render
     return (
         <div className="space-y-8">
-            <h2 className="text-3xl font-bold text-white">Panel de Control</h2>
             
             {/* KPIs */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

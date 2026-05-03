@@ -38,8 +38,20 @@ const Inventory: React.FC<Props> = ({ showToast, permissions }) => {
     // Early return ANTES de cualquier lógica compleja
     if (isLoading) {
         return (
-            <div className="flex items-center justify-center h-screen">
-                <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
+            <div className="flex flex-col items-center justify-center py-20">
+                <div className="relative w-12 h-12">
+                    <div className="absolute inset-0 rounded-full" style={{
+                        background: 'conic-gradient(from 0deg, transparent 0%, rgba(99, 102, 241, 0.1) 25%, rgba(59, 130, 246, 0.4) 50%, rgba(56, 189, 248, 0.8) 75%, transparent 100%)',
+                        animation: 'spin-gradient 1s linear infinite',
+                    }} />
+                    <div className="absolute inset-[3px] rounded-full bg-slate-950" />
+                    <div className="absolute inset-0 rounded-full" style={{
+                        background: 'conic-gradient(from 0deg, transparent 70%, rgba(56, 189, 248, 0.6) 100%)',
+                        animation: 'spin-gradient 1s linear infinite',
+                    }} />
+                    <div className="absolute inset-[3px] rounded-full bg-slate-900" />
+                </div>
+                <p className="mt-4 text-sm text-gray-500 tracking-wide">Cargando inventario...</p>
             </div>
         );
     }
@@ -256,10 +268,7 @@ const Inventory: React.FC<Props> = ({ showToast, permissions }) => {
 
     return (
         <div className="space-y-8">
-            <div className="space-y-4">
-                <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
-                    <h2 className="text-3xl font-bold text-white">Inventario</h2>
-                </div>
+            <div className="space-y-6">
                 <ProtectedAction
                     hasPermission={permissions.canCreate}
                     fallbackMessage="No tienes permisos para añadir bicicletas"

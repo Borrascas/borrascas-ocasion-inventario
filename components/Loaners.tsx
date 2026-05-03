@@ -299,10 +299,7 @@ const Loaners: React.FC<LoanersProps> = ({ permissions, showToast }) => {
 
     return (
         <div className="space-y-6">
-            <div className="space-y-4">
-                <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
-                    <h2 className="text-3xl font-bold text-white">Bicicletas de Préstamo</h2>
-                </div>
+            <div className="space-y-6">
                 <ProtectedAction
                     hasPermission={permissions.canCreate}
                     fallbackMessage="No tienes permisos para añadir bicicletas de préstamo"

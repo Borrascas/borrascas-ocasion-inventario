@@ -173,8 +173,6 @@ const Settings: React.FC<SettingsProps> = ({ permissions, userProfile }) => {
 
     return (
         <div className="space-y-8 max-w-4xl mx-auto">
-            <h2 className="text-3xl font-bold text-white">Configuración</h2>
-
             {/* Sección Usuario */}
             <Card title="Usuario">
                 <div className="space-y-4">

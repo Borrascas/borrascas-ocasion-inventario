@@ -22,9 +22,20 @@ import { UserRole } from './types';
 
 const LoadingSpinner: React.FC = () => {
     return (
-        <div className="flex items-center justify-center h-screen bg-gray-900" style={{ height: '-webkit-fill-available' }}>
-            <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
-            <div className="absolute mt-40 text-white">Cargando...</div>
+        <div className="flex flex-col items-center justify-center h-screen bg-slate-950" style={{ height: '-webkit-fill-available' }}>
+            <div className="relative w-16 h-16">
+                <div className="absolute inset-0 rounded-full" style={{
+                    background: 'conic-gradient(from 0deg, transparent 0%, rgba(99, 102, 241, 0.1) 25%, rgba(59, 130, 246, 0.4) 50%, rgba(56, 189, 248, 0.8) 75%, transparent 100%)',
+                    animation: 'spin-gradient 1s linear infinite',
+                }} />
+                <div className="absolute inset-[3px] rounded-full bg-slate-950" />
+                <div className="absolute inset-0 rounded-full" style={{
+                    background: 'conic-gradient(from 0deg, transparent 70%, rgba(56, 189, 248, 0.6) 100%)',
+                    animation: 'spin-gradient 1s linear infinite',
+                }} />
+                <div className="absolute inset-[3px] rounded-full bg-slate-950" />
+            </div>
+            <p className="mt-5 text-sm text-gray-500 tracking-wide font-medium">Cargando...</p>
         </div>
     );
 };
@@ -74,11 +85,11 @@ const AuthenticatedApp: React.FC<{ session: Session }> = ({ session }) => {
                         onDismiss={dismissPrompt}
                     />
                 )}
-                <div className="flex min-h-screen bg-gray-900 text-gray-100" style={{ minHeight: '-webkit-fill-available' }}>
+                <div className="flex min-h-screen bg-slate-950 text-gray-100" style={{ minHeight: '-webkit-fill-available' }}>
                     <Sidebar isOpen={isSidebarOpen} setIsOpen={setSidebarOpen} permissions={permissions} showToast={showToast} />
                     <div className="flex-1 flex flex-col">
                         <Header toggleSidebar={() => setSidebarOpen(!isSidebarOpen)} />
-                        <main className="flex-1 bg-gray-800 p-4 md:p-6 lg:p-8">
+                        <main className="flex-1 p-4 md:p-6 lg:p-8" style={{ background: 'linear-gradient(180deg, rgba(15, 23, 42, 0.5) 0%, rgba(15, 23, 42, 0.8) 100%)' }}>
                             <Routes>
                                 <Route path="/" element={<Navigate to="/inventory" replace />} />
                                 <Route path="/dashboard" element={<Dashboard permissions={permissions} />} />
