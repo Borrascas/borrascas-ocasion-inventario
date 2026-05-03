@@ -27,8 +27,8 @@ const Settings: React.FC<SettingsProps> = ({ permissions, userProfile }) => {
     const loanerBikes = loanerBikesData?.bikes || [];
 
     const Card: React.FC<{title: string; children: React.ReactNode; className?: string}> = ({ title, children, className }) => (
-        <div className={`p-[1px] bg-gradient-to-b from-gray-700/80 to-transparent rounded-xl ${className}`}>
-            <div className="bg-gray-800/90 h-full w-full rounded-xl p-6">
+        <div className={`p-[1px] bg-gradient-to-b from-gray-700/80 to-transparent rounded-xl w-full overflow-hidden ${className}`}>
+            <div className="bg-gray-800/90 h-full w-full rounded-xl p-4 sm:p-6">
                 <h3 className="text-xl font-semibold text-white mb-4 flex items-center">
                     {title}
                 </h3>
@@ -244,7 +244,7 @@ const Settings: React.FC<SettingsProps> = ({ permissions, userProfile }) => {
                                                             ) : user.id !== userProfile?.id && (
                                                                 <button
                                                                     onClick={() => setDeleteConfirmUser(user)}
-                                                                    className="p-2 text-red-500 hover:text-red-400 hover:bg-red-500/20 rounded transition-colors border border-transparent hover:border-red-500/30"
+                                                                    className="p-2 text-red-500 hover:text-red-400 hover:bg-red-500/20 rounded transition-colors border border-transparent hover:border-red-500/30 shrink-0"
                                                                     title="Eliminar usuario"
                                                                 >
                                                                     <TrashIcon className="w-4 h-4" />
