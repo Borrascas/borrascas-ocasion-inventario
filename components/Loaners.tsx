@@ -260,9 +260,31 @@ const Loaners: React.FC<LoanersProps> = ({ permissions, showToast }) => {
         { label: 'Alquiladas', value: LoanerBikeStatus.Alquilada },
     ];
 
+    const getCardStyle = (status: LoanerBikeStatus) => {
+        switch (status) {
+            case LoanerBikeStatus.Prestada:
+                return 'bg-orange-950/40 border border-orange-500/40 border-l-4 border-l-orange-500 shadow-[0_4px_25px_rgba(249,115,22,0.1)]';
+            case LoanerBikeStatus.Alquilada:
+                return 'bg-purple-950/40 border border-purple-500/40 border-l-4 border-l-purple-500 shadow-[0_4px_25px_rgba(168,85,247,0.1)]';
+            default: // Available
+                return 'bg-sky-950/20 border border-sky-500/30 border-l-4 border-l-sky-500 shadow-[0_4px_25px_rgba(14,165,233,0.05)]';
+        }
+    };
+
+    const getRowStyle = (status: LoanerBikeStatus) => {
+        switch (status) {
+            case LoanerBikeStatus.Prestada:
+                return 'bg-orange-950/30 border-l-4 border-l-orange-500 hover:bg-orange-950/45';
+            case LoanerBikeStatus.Alquilada:
+                return 'bg-purple-950/30 border-l-4 border-l-purple-500 hover:bg-purple-950/45';
+            default: // Available
+                return 'bg-sky-950/10 border-l-4 border-l-sky-500 hover:bg-sky-950/20';
+        }
+    };
+
     const BikeCard: React.FC<{ bike: LoanerBike }> = ({ bike }) => (
         <div className="p-[1px] bg-gradient-to-b from-gray-700/80 to-transparent rounded-lg">
-            <div className={`bg-gray-800/90 h-full w-full rounded-lg overflow-hidden flex animate-fade-in group hover:scale-[1.02] hover:shadow-lg hover:shadow-black/20 transition-all duration-200 ${LOANER_STATUS_COLORS[bike.status]}`}>
+            <div className={`h-full w-full rounded-lg overflow-hidden flex animate-fade-in group hover:scale-[1.02] hover:shadow-lg hover:shadow-black/20 transition-all duration-200 ${getCardStyle(bike.status)}`}>
                 {bike.imageUrl ? (
                     <img src={bike.imageUrl} alt={`${bike.brand} ${bike.model}`} className="w-24 h-full object-cover" />
                 ) : (
@@ -364,7 +386,7 @@ const Loaners: React.FC<LoanersProps> = ({ permissions, showToast }) => {
                                     ))
                                 : 
                                     filteredBikes.map((bike, index) => (
-                                    <tr key={bike.id} className={`border-t border-gray-700/50 ${LOANER_STATUS_COLORS[bike.status]} transition-all duration-200 animate-fade-in hover:shadow-lg hover:shadow-black/20`} style={{ animationDelay: `${index * 50}ms` }}>
+                                    <tr key={bike.id} className={`border-t border-gray-700/50 ${getRowStyle(bike.status)} transition-all duration-200 animate-fade-in hover:shadow-lg hover:shadow-black/20`} style={{ animationDelay: `${index * 50}ms` }}>
                                         <td className="p-4 text-gray-400 font-mono">{bike.refNumber}</td>
                                         <td className="p-4">
                                             {bike.imageUrl ? (
