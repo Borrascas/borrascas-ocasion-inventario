@@ -108,6 +108,7 @@ const AuthenticatedApp: React.FC<{ session: Session }> = ({ session }) => {
 const App: React.FC = () => {
     const [session, setSession] = useState<Session | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [isPasswordRecovery, setIsPasswordRecovery] = useState(false);
 
     useEffect(() => {
         const fetchSession = async () => {
@@ -123,9 +124,16 @@ const App: React.FC = () => {
 
         fetchSession();
 
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-            setSession(session);
-            setIsLoading(false);
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+            if (event === 'PASSWORD_RECOVERY') {
+                setIsPasswordRecovery(true);
+                setSession(session);
+                setIsLoading(false);
+            } else {
+                setIsPasswordRecovery(false);
+                setSession(session);
+                setIsLoading(false);
+            }
         });
 
         return () => subscription.unsubscribe();
@@ -133,6 +141,10 @@ const App: React.FC = () => {
 
     if (isLoading) {
         return <LoadingSpinner />;
+    }
+
+    if (isPasswordRecovery) {
+        return <Auth isPasswordRecovery onPasswordRecoveryDone={() => setIsPasswordRecovery(false)} />;
     }
 
     if (!session) {
