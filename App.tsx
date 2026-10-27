@@ -108,10 +108,13 @@ const AuthenticatedApp: React.FC<{ session: Session }> = ({ session }) => {
 const App: React.FC = () => {
     const [session, setSession] = useState<Session | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    
     // Detectar inmediatamente si la URL contiene un token de recuperación de contraseña
     const [isPasswordRecovery, setIsPasswordRecovery] = useState(() => {
-        const hash = window.location.hash;
-        return hash.includes('type=recovery') || hash.includes('type%3Drecovery');
+        const hash = window.location.hash || '';
+        const search = window.location.search || '';
+        return hash.includes('type=recovery') || hash.includes('type%3Drecovery') ||
+               search.includes('type=recovery') || search.includes('type%3Drecovery');
     });
 
     useEffect(() => {
@@ -129,15 +132,16 @@ const App: React.FC = () => {
         fetchSession();
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+            setSession(session);
+            setIsLoading(false);
+
             if (event === 'PASSWORD_RECOVERY') {
                 setIsPasswordRecovery(true);
-                setSession(session);
-                setIsLoading(false);
-            } else {
+            } else if (event === 'SIGNED_OUT') {
                 setIsPasswordRecovery(false);
-                setSession(session);
-                setIsLoading(false);
             }
+            // NO desactivamos isPasswordRecovery en SIGNED_IN ni INITIAL_SESSION,
+            // ya que Supabase emite estos eventos justo después de PASSWORD_RECOVERY.
         });
 
         return () => subscription.unsubscribe();
@@ -148,7 +152,17 @@ const App: React.FC = () => {
     }
 
     if (isPasswordRecovery) {
-        return <Auth isPasswordRecovery onPasswordRecoveryDone={() => setIsPasswordRecovery(false)} />;
+        return (
+            <Auth 
+                isPasswordRecovery 
+                onPasswordRecoveryDone={() => {
+                    setIsPasswordRecovery(false);
+                    if (window.location.hash.includes('type=recovery') || window.location.hash.includes('access_token')) {
+                        window.location.hash = '#/inventory';
+                    }
+                }} 
+            />
+        );
     }
 
     if (!session) {

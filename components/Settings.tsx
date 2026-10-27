@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LogOutIcon, DownloadIcon, UserIcon, MoonIcon, SunIcon, UsersIcon, CheckCircleIcon, XIcon, TrashIcon } from './ui/Icons';
+import { LogOutIcon, DownloadIcon, UserIcon, MoonIcon, SunIcon, UsersIcon, CheckCircleIcon, XIcon, TrashIcon, LockIcon } from './ui/Icons';
 import { supabase } from '../services/supabaseClient';
 import { useBikes } from '../services/bikeQueries';
 import { useLoanerBikes } from '../services/loanerBikeQueries';
@@ -21,6 +21,14 @@ const Settings: React.FC<SettingsProps> = ({ permissions, userProfile }) => {
     const [showUserManagement, setShowUserManagement] = useState(false);
     const [updatingUser, setUpdatingUser] = useState<string | null>(null);
     const [deleteConfirmUser, setDeleteConfirmUser] = useState<UserProfile | null>(null);
+
+    // Estados para Cambiar Contraseña directamente
+    const [showChangePassword, setShowChangePassword] = useState(false);
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmNewPassword, setConfirmNewPassword] = useState('');
+    const [passwordLoading, setPasswordLoading] = useState(false);
+    const [passwordSuccess, setPasswordSuccess] = useState(false);
+    const [passwordError, setPasswordError] = useState<string | null>(null);
     
     const { data: bikes } = useBikes();
     const { data: loanerBikesData } = useLoanerBikes({ page: 1, pageSize: 1000 }); // Obtenemos todas las bicis para export
@@ -39,6 +47,42 @@ const Settings: React.FC<SettingsProps> = ({ permissions, userProfile }) => {
 
     const handleSignOut = async () => {
         await supabase.auth.signOut();
+    };
+
+    const handleChangePassword = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setPasswordError(null);
+        setPasswordSuccess(false);
+
+        if (newPassword.length < 6) {
+            setPasswordError('La contraseña debe tener al menos 6 caracteres');
+            return;
+        }
+
+        if (newPassword !== confirmNewPassword) {
+            setPasswordError('Las contraseñas no coinciden');
+            return;
+        }
+
+        setPasswordLoading(true);
+        try {
+            const { error } = await supabase.auth.updateUser({ password: newPassword });
+            if (error) {
+                setPasswordError(error.message);
+            } else {
+                setPasswordSuccess(true);
+                setNewPassword('');
+                setConfirmNewPassword('');
+                setTimeout(() => {
+                    setPasswordSuccess(false);
+                    setShowChangePassword(false);
+                }, 3000);
+            }
+        } catch (err: any) {
+            setPasswordError(err.message || 'Error al cambiar la contraseña');
+        } finally {
+            setPasswordLoading(false);
+        }
     };
 
     const loadUsers = async () => {
@@ -191,6 +235,68 @@ const Settings: React.FC<SettingsProps> = ({ permissions, userProfile }) => {
                                 )}
                             </div>
                         </div>
+                    </div>
+
+                    {/* Botón y Formulario de Cambiar Contraseña */}
+                    <div className="border-t border-gray-600/50 pt-4">
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setShowChangePassword(!showChangePassword);
+                                setPasswordError(null);
+                                setPasswordSuccess(false);
+                            }}
+                            className="w-full flex items-center justify-center p-3 rounded-lg transition-colors duration-200 bg-amber-600/20 hover:bg-amber-600/30 text-amber-300 hover:text-amber-200 border border-amber-600/30"
+                        >
+                            <LockIcon className="w-5 h-5 mr-3" />
+                            <span className="font-medium">
+                                {showChangePassword ? 'Cancelar Cambio de Contraseña' : 'Cambiar Contraseña'}
+                            </span>
+                        </button>
+
+                        {showChangePassword && (
+                            <form onSubmit={handleChangePassword} className="p-4 bg-gray-900/60 border border-gray-700/60 rounded-xl space-y-3 mt-3 animate-fade-in">
+                                <h4 className="text-sm font-semibold text-white mb-2">Establecer nueva contraseña</h4>
+                                <div>
+                                    <label className="block text-xs text-gray-400 mb-1">Nueva contraseña</label>
+                                    <input
+                                        type="password"
+                                        value={newPassword}
+                                        onChange={(e) => setNewPassword(e.target.value)}
+                                        required
+                                        placeholder="Mínimo 6 caracteres"
+                                        className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm focus:border-blue-500 focus:outline-none"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs text-gray-400 mb-1">Confirmar contraseña</label>
+                                    <input
+                                        type="password"
+                                        value={confirmNewPassword}
+                                        onChange={(e) => setConfirmNewPassword(e.target.value)}
+                                        required
+                                        placeholder="Repite la nueva contraseña"
+                                        className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white text-sm focus:border-blue-500 focus:outline-none"
+                                    />
+                                </div>
+
+                                {passwordError && (
+                                    <p className="text-xs text-red-400 bg-red-950/40 p-2 rounded border border-red-500/20">{passwordError}</p>
+                                )}
+
+                                {passwordSuccess && (
+                                    <p className="text-xs text-green-400 bg-green-950/40 p-2 rounded border border-green-500/20">¡Contraseña actualizada con éxito!</p>
+                                )}
+
+                                <button
+                                    type="submit"
+                                    disabled={passwordLoading}
+                                    className="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-medium text-sm rounded-lg transition-colors"
+                                >
+                                    {passwordLoading ? 'Guardando...' : 'Guardar Nueva Contraseña'}
+                                </button>
+                            </form>
+                        )}
                     </div>
 
                     {/* Gestión de Usuarios - Solo para Admins */}

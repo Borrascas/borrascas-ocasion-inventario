@@ -10,6 +10,8 @@ interface AuthProps {
 
 const Auth: React.FC<AuthProps> = ({ isPasswordRecovery = false, onPasswordRecoveryDone }) => {
     const [isLogin, setIsLogin] = useState(true);
+    const [isForgotPassword, setIsForgotPassword] = useState(false);
+    const [resetEmailSent, setResetEmailSent] = useState(false);
     const [loading, setLoading] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -69,7 +71,24 @@ const Auth: React.FC<AuthProps> = ({ isPasswordRecovery = false, onPasswordRecov
             setPasswordChanged(true);
             setTimeout(() => {
                 onPasswordRecoveryDone?.();
-            }, 2500);
+            }, 2000);
+        }
+    };
+
+    const handleResetPasswordRequest = async (event: React.FormEvent) => {
+        event.preventDefault();
+        setLoading(true);
+        setError(null);
+
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+            redirectTo: window.location.origin,
+        });
+
+        setLoading(false);
+        if (error) {
+            setError(error.message);
+        } else {
+            setResetEmailSent(true);
         }
     };
 
@@ -102,7 +121,7 @@ const Auth: React.FC<AuthProps> = ({ isPasswordRecovery = false, onPasswordRecov
                     <div className="glass-card-strong rounded-2xl p-8 shadow-2xl">
                         <img src={logoSrc} alt="Logo" className="h-12 mx-auto mb-6 object-contain drop-shadow-lg" />
 
-                        {/* ── MODO: CAMBIAR CONTRASEÑA ── */}
+                        {/* ── MODO 1: CAMBIAR CONTRASEÑA (DESDE ENLACE DE RECUPERACIÓN) ── */}
                         {isPasswordRecovery ? (
                             passwordChanged ? (
                                 <div className="text-center animate-fade-in">
@@ -112,12 +131,12 @@ const Auth: React.FC<AuthProps> = ({ isPasswordRecovery = false, onPasswordRecov
                                         </svg>
                                     </div>
                                     <h2 className="text-2xl font-bold text-white mb-2">¡Contraseña cambiada!</h2>
-                                    <p className="text-gray-400 text-sm">Redirigiendo a la aplicación...</p>
+                                    <p className="text-gray-400 text-sm">Entrando a la aplicación...</p>
                                 </div>
                             ) : (
                                 <>
                                     <h2 className="text-2xl font-bold text-center text-white mb-2 tracking-tight">Nueva contraseña</h2>
-                                    <p className="text-center text-gray-400 text-sm mb-6">Elige una contraseña segura para tu cuenta.</p>
+                                    <p className="text-center text-gray-400 text-sm mb-6">Introduce la nueva contraseña para tu cuenta.</p>
                                     <form onSubmit={handlePasswordChange} className="space-y-5">
                                         <div>
                                             <label htmlFor="new-password" className="block text-sm font-medium text-gray-400 mb-1.5">
@@ -179,15 +198,92 @@ const Auth: React.FC<AuthProps> = ({ isPasswordRecovery = false, onPasswordRecov
                                                         <span>Guardando...</span>
                                                     </div>
                                                 ) : (
-                                                    'Guardar contraseña'
+                                                    'Guardar Contraseña'
                                                 )}
                                             </button>
                                         </div>
                                     </form>
                                 </>
                             )
+                        ) : isForgotPassword ? (
+                            /* ── MODO 2: PEDIR RECUPERACIÓN DE CONTRASEÑA ── */
+                            resetEmailSent ? (
+                                <div className="text-center animate-fade-in">
+                                    <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-blue-500/20 flex items-center justify-center">
+                                        <svg className="w-8 h-8 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                        </svg>
+                                    </div>
+                                    <h2 className="text-2xl font-bold text-white mb-3">Revisa tu correo</h2>
+                                    <p className="text-gray-300 text-sm mb-6">Hemos enviado un enlace de recuperación a <strong>{email}</strong>.</p>
+                                    <button 
+                                        onClick={() => { setIsForgotPassword(false); setResetEmailSent(false); setError(null); }}
+                                        className="font-medium text-blue-400 hover:text-blue-300 transition-colors text-sm"
+                                    >
+                                        Volver a Iniciar Sesión
+                                    </button>
+                                </div>
+                            ) : (
+                                <>
+                                    <h2 className="text-2xl font-bold text-center text-white mb-2 tracking-tight">Recuperar contraseña</h2>
+                                    <p className="text-center text-gray-400 text-sm mb-6">Introduce tu correo y te enviaremos un enlace para crear una nueva contraseña.</p>
+                                    <form onSubmit={handleResetPasswordRequest} className="space-y-5">
+                                        <div>
+                                            <label htmlFor="reset-email" className="block text-sm font-medium text-gray-400 mb-1.5">
+                                                Email
+                                            </label>
+                                            <div className="relative">
+                                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                                    <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                                    </svg>
+                                                </div>
+                                                <input
+                                                    id="reset-email"
+                                                    type="email"
+                                                    value={email}
+                                                    required
+                                                    onChange={(e) => setEmail(e.target.value)}
+                                                    className="block w-full pl-10 pr-4 py-2.5 bg-gray-800/60 border border-gray-700/50 rounded-xl text-white placeholder-gray-500 transition-all duration-200"
+                                                    placeholder="tu@email.com"
+                                                />
+                                            </div>
+                                        </div>
+                                        {error && (
+                                            <div className="flex items-start space-x-2 text-sm text-red-400 p-3 bg-red-900/20 rounded-xl border border-red-500/20 animate-fade-in">
+                                                <AlertCircleIcon className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                                                <span>{error}</span>
+                                            </div>
+                                        )}
+                                        <div className="pt-1">
+                                            <button
+                                                type="submit"
+                                                disabled={loading}
+                                                className="w-full flex justify-center py-3 px-4 rounded-xl text-sm font-semibold text-white btn-premium disabled:opacity-50 disabled:cursor-not-allowed tracking-wide"
+                                            >
+                                                {loading ? (
+                                                    <div className="flex items-center space-x-2">
+                                                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                                        <span>Enviando...</span>
+                                                    </div>
+                                                ) : (
+                                                    'Enviar enlace de recuperación'
+                                                )}
+                                            </button>
+                                        </div>
+                                    </form>
+                                    <div className="mt-6 pt-6 border-t border-gray-700/30 text-center">
+                                        <button 
+                                            onClick={() => { setIsForgotPassword(false); setError(null); }}
+                                            className="font-medium text-blue-400 hover:text-blue-300 transition-colors text-sm"
+                                        >
+                                            ← Volver a Iniciar Sesión
+                                        </button>
+                                    </div>
+                                </>
+                            )
                         ) : (
-                            /* ── MODO: LOGIN / REGISTRO ── */
+                            /* ── MODO 3: LOGIN / REGISTRO NORMAL ── */
                             <>
                                 {showConfirmation ? (
                                     <div className="text-center animate-fade-in">
@@ -233,9 +329,20 @@ const Auth: React.FC<AuthProps> = ({ isPasswordRecovery = false, onPasswordRecov
                                                 </div>
                                             </div>
                                             <div>
-                                                <label htmlFor="password" className="block text-sm font-medium text-gray-400 mb-1.5">
-                                                    Contraseña
-                                                </label>
+                                                <div className="flex items-center justify-between mb-1.5">
+                                                    <label htmlFor="password" className="block text-sm font-medium text-gray-400">
+                                                        Contraseña
+                                                    </label>
+                                                    {isLogin && (
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => { setIsForgotPassword(true); setError(null); }}
+                                                            className="text-xs text-blue-400 hover:text-blue-300 transition-colors"
+                                                        >
+                                                            ¿Olvidaste la contraseña?
+                                                        </button>
+                                                    )}
+                                                </div>
                                                 <div className="relative">
                                                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                                         <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
