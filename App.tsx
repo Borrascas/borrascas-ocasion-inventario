@@ -108,7 +108,11 @@ const AuthenticatedApp: React.FC<{ session: Session }> = ({ session }) => {
 const App: React.FC = () => {
     const [session, setSession] = useState<Session | null>(null);
     const [isLoading, setIsLoading] = useState(true);
-    const [isPasswordRecovery, setIsPasswordRecovery] = useState(false);
+    // Detectar inmediatamente si la URL contiene un token de recuperación de contraseña
+    const [isPasswordRecovery, setIsPasswordRecovery] = useState(() => {
+        const hash = window.location.hash;
+        return hash.includes('type=recovery') || hash.includes('type%3Drecovery');
+    });
 
     useEffect(() => {
         const fetchSession = async () => {

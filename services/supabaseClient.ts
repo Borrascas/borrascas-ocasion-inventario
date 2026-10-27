@@ -18,4 +18,9 @@ if (!supabaseUrl || !supabaseAnonKey) {
     throw new Error(errorMsg);
 }
 
-export const supabase: SupabaseClient<Database> = createClient<Database>(supabaseUrl, supabaseAnonKey);
+export const supabase: SupabaseClient<Database> = createClient<Database>(supabaseUrl, supabaseAnonKey, {
+    auth: {
+        detectSessionFromUrl: true,
+        flowType: 'implicit',
+    }
+});
